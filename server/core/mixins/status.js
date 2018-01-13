@@ -19,24 +19,27 @@ const GameStatusMixin =  {
 
     const status = {};
     Object.defineProperties(status, {
-      idle: targetStatus('idle'),
-      prepare: targetStatus('prepare'),
-      start: targetStatus('start'),
-      ending: targetStatus('ending'),
-      result: targetStatus('result'),
+      idle: createStatusProps('idle'),
+      ready: createStatusProps('idle'),
+      prepare: createStatusProps('prepare'),
+      start: createStatusProps('start'),
+      ending: createStatusProps('ending'),
+      result: createStatusProps('result'),
     });
     this.status = status;
 
     const createStatusChangeHandle = (targetStatus) => {
       self.on(`status:${targetStatus}`);
     };
-    const onStatus = {
+    const onStatusChange = {
       idle: createStatusChangeHandle('idle'),
+      ready: createStatusChangeHandle('idle'),
       prepare: createStatusChangeHandle('prepare'),
       start: createStatusChangeHandle('start'),
       ending: createStatusChangeHandle('ending'),
       result: createStatusChangeHandle('result'),
     };
+    this.onStatusChange = onStatusChange;
   },
 }
 
