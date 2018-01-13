@@ -1,30 +1,67 @@
-class QuestionsQueue {
-  constructor(sortedQustionsData) {
-    this.questionsData = sortedQustionsData;
+const { shuffle } = require('lodash');
+
+class UserQuestions {
+  constructor(questionsData) {
+    this.questionsData = questionsData;
+    this.current = null;
     this.index = -1;
-    this.historyIndexMap = {};
+    this.historys = {};
   }
-  getCurrent() {
-  const current = this.questionsData[this.index];
-  if (current) {
-    this.historyIndexMap[current.id] = this.index;
+  _createQuestion(quesionData) {
+    const questions = this;
+    const question = {
+      id: quesionData.id,
+      _data: quesionData,
+      _correct: null,
+      giveup() {
+        question._correct = false;
+      },
+      answer(answerCode) {
+        question._correct = question._data.answer == answerCode;
+      },
+      isAnswered() {
+        return question._correct == null;
+      },
+      isCurrent() {
+        return questions.current.id === question.id;
+      },
+      getQuiz() {
+        return {
+          id: quesionData.id,
+          question: quesionData.question,
+          options: shuffle(quesionData.options),
+        };
+      }
+    };
+
+    return question;
   }
-  return current;
+  next() {
+    this.index += 1;
+    const questionData = this.questionsData[this.index];
+    if (!questionData) return null;
+
+    const question = this._createQuestion();
+    this.historys[question.id] = question;
+    return question;
   }
-  getNext() {
-  this.index++;
-  return this.getCurrent();
-  }
-  checkCorrect(questionId, answerCode) {
-    const index = this.historyIndexMap[questionId];
-    if (index == null) return false;
-    const target = this.questionsData[index];
-    if (!target) return false;
-    return target.correct == answerCode;
-  }
-  isHistory(questionId) {
-    return this.historyIndexMap[questionId] == null;
+  getResultCount() {
+    const historyQuestionIds = Object.keys(this.historys);
+    const total = historyQuestionIds.length;
+    const correct = historyQuestionIds.reduce(((p, id) => {
+      if (!this.historys[id].correct) {
+        return p;
+      }
+      return p + 1;
+    }, id), 0);
+    const wrong = total - correct;
+
+    return {
+      total,
+      correct,
+      wrong,
+    };
   }
 }
 
-module.exports = QuestionsQueue;
+module.exports = UserQuestions;
