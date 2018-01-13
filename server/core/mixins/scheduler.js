@@ -50,7 +50,7 @@ const GameSchedulerMixin =  {
     }
   },
   startScheduler() {
-    lt.setInterval(() => {
+    this._scheduleTimer = lt.setInterval(() => {
       this._timeTick(Date.now());
     }, 500);
   },
