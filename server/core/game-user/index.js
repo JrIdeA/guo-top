@@ -1,5 +1,5 @@
 const QuestionsManager = require('../questions/manager');
-const GameUserStatistic = require('./Statistics');
+const GameUserStatistic = require('./statistics');
 
 function createGameUser(users, game) {
   const questions = QuestionsManager.getRandomQueue();
@@ -23,7 +23,7 @@ function createGameUser(users, game) {
         stat.addAnswerLog({
           questionId: currentQuestion.id,
           giveup: true,
-        })
+        });
       }
 
       const nextQuestion = questions.next();
@@ -46,8 +46,8 @@ function createGameUser(users, game) {
       }
       const correct = target.answer(answerCode);
       correct ? stat.markCorrect() : stat.markWrong();
-      stat.addAnswerLog({ 
-        questionId, answerCode, answerClientTime
+      stat.addAnswerLog({
+        questionId, answerCode, answerClientTime,
       });
       return {
         questionId,
@@ -65,7 +65,7 @@ function createGameUser(users, game) {
     isTimeout() {
       return game.status.ending;
     }
-  }
+  };
 }
 
 module.exports = createGameUser;

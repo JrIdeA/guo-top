@@ -48,12 +48,12 @@ class UserQuestions {
   getResultCount() {
     const historyQuestionIds = Object.keys(this.historys);
     const total = historyQuestionIds.length;
-    const correct = historyQuestionIds.reduce(((p, id) => {
+    const correct = historyQuestionIds.reduce((p, id) => {
       if (!this.historys[id].correct) {
         return p;
       }
       return p + 1;
-    }, id), 0);
+    }, 0);
     const wrong = total - correct;
 
     return {

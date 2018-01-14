@@ -14,6 +14,8 @@ const {
 const {
   WS_SERVER_ERROR,
   WS_SERVER_WELCOME,
+  WS_SERVER_SEND_QUESTION,
+  WS_SERVER_SEND_ANSWER_RESULT,
 } = require('../../../shared/error');
 
 module.exports = function createWsReponse(ws) {
@@ -32,6 +34,8 @@ module.exports = function createWsReponse(ws) {
   return {
     send: {
       welcome: sendSuccess(WS_SERVER_WELCOME),
+      question: sendSuccess(WS_SERVER_SEND_QUESTION),
+      answer: sendSuccess(WS_SERVER_SEND_ANSWER_RESULT),
     },
     error: {
       badRequest: sendError(ERROR_BAD_REQUEST),

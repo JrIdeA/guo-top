@@ -1,5 +1,5 @@
-const WebSocket = require('ws');
 const http = require('http');
+const WebSocket = require('ws');
 const config = require('../config');
 const {
   WS_CLIENT_TICKET,
