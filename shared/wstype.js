@@ -1,0 +1,9 @@
+exports.WS_CLIENT_TICKET = 1;
+exports.WS_CLIENT_GET_QUESTION = 2;
+exports.WS_CLIENT_SEND_ANSWER = 3;
+exports.WS_CLIENT_END = 4;
+
+exports.WS_SERVER_ERROR = 1;
+exports.WS_SERVER_WELCOME = 2;
+exports.WS_SERVER_SEND_QUESTION = 3;
+exports.WS_SERVER_SEND_ANSWER_RESULT = 4;
