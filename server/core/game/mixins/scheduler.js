@@ -1,9 +1,10 @@
 const { defaults } = require('lodash');
 const lt = require('long-timeout');
+const invariant = require('invariant');
 
 /**
- * parse game options startTime string to timestamp
- * 
+ * parse game config startTime string to timestamp
+ *
  * @param {string} startTimeStr - 'YYYY-MM-DD HH:mm:ss'
  */
 function parseStartTime(startTimeStr) {
@@ -14,14 +15,14 @@ function parseStartTime(startTimeStr) {
   return (new Date(m[1], m[2], m[3], m[4], m[5], m[6])).valueOf();
 }
 
-const GameSchedulerMixin =  {
-  initScheduler(options) {
+const GameSchedulerProto = {
+  initScheduler() {
     const {
       startTime: startTimeStr,
       prepareSeconds,
       playtimeSeconds,
       deadtimeSeconds,
-    } = defaults(options, {
+    } = defaults(this.config, {
       startTime: '',
       prepareSeconds: 3,
       playtimeSeconds: 60,
@@ -29,23 +30,27 @@ const GameSchedulerMixin =  {
     });
 
     const startTime = parseStartTime(startTimeStr);
-    const prepareTime = startTime - prepareSeconds * 1000;
-    const deadTime = startTime + deadtimeSeconds * 1000; 
+    const prepareTime = startTime - (prepareSeconds * 1000);
+    const endTime = startTime + (playtimeSeconds * 1000);
+    const deadTime = startTime + (deadtimeSeconds * 1000); 
+    invariant(startTime, `game startTime invalid, parsed: ${startTime}`);
+    invariant(prepareTime > 0, `game prepareTime invalid, parsed: ${prepareTime}`);
+    invariant(deadTime > startTime, `game deadTime should after then startTime, deadTime: ${deadTime}, startTime: ${startTime}`);
 
-    this.options = options;
     this.startTime = startTime;
     this.prepareTime = prepareTime;
+    this.endTime = endTime;
     this.deadTime = deadTime;
     this.validStartime = startTime > 0;
   },
   _timeTick(currentTime) {
-    if (this.status.idle && currentTime > prepareTime) {
+    if (this.status.idle && currentTime > this.prepareTime) {
       this.status.prepare = true;
     }
-    if (this.status.prepare && currentTime > startTime) {
+    if (this.status.prepare && currentTime > this.startTime) {
       this.status.start = true;
     }
-    if (this.status.start && currentTime > deadTime) {
+    if (this.status.start && currentTime > this.deadTime) {
       this.status.ending = true;
     }
   },
@@ -54,6 +59,6 @@ const GameSchedulerMixin =  {
       this._timeTick(Date.now());
     }, 500);
   },
-}
+};
 
-module.exports = GameSchedulerMixin;
+module.exports = GameSchedulerProto;
