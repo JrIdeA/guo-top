@@ -1,9 +1,14 @@
-import { WS_CLIENT_END } from '../shared/wstype';
-
 const WebSocket = require('ws');
-const http = require('ws');
-// const {} = require('../shared/error');
-const { WS_CLIENT_TICKET } = require('./wstype');
+const http = require('http');
+const config = require('../config');
+const {
+  WS_CLIENT_TICKET,
+  WS_CLIENT_GET_QUESTION,
+  WS_CLIENT_SEND_ANSWER,
+  // WS_CLIENT_END,
+} = require('../shared/wstype');
+const createWsReponse = require('./core/response');
+const Game = require('./core/game');
 
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,81 +20,78 @@ const wss = new WebSocket.Server({
   verifyClient() {
     console.log('ding dong');
     return true;
-  }
+  },
 });
 
-// const context = {
-//   onlineUsers: {},
-//   game
-// };
+// start scheduler
+const game = new Game(config.game);
 
-const context = {
-  users: {
-    'abcdefghijklmn': 'yejiren'
-  },
-  onlineUsers: {},
-  game: {
-    status: 'idle'
-  },
-};
-
-const getResponseActions = (user = {
-  id: 'yejiren',
-  isOnline: () => true,
-  userGame: {
-    count,
-    qaManager,
-  },
-}, response = {
-  error: {
-    userNotOnline() {},
-    gameNotStart() {},
-    gameEnding() {},
-    gameEndResulted() {},
-    userGameTimeout() {},
-    userGameAlreadyAnswered() {},
+wss.on('connection', (ws) => {
+  const response = createWsReponse(ws);
+  if (game.status.idle) {
+    response.error.gameInIdle();
   }
-}) => {
-  return {
-    [WS_CLIENT_TICKET](payload) {
-      if (!user.isOnline()) {
-        return response.error.userNotOnline();
-      }
-      return response.success({
-        userId: user.id,
-        gameStatus: game.status,
-        count: user.userGame.count,
-      });
-    },
-    [WS_CLIENT_GET_QUESTION](payload) {
+
+  let user;
+  const actions = {
+    [WS_CLIENT_TICKET]({
+      token,
+    }) {
       game.condStatus([
         ['idle', () => {
-          response.error.gameNotStart();
+          response.error.gameInIdle();
         }],
-        ['ending', () => {
-          response.error.gameEnding();
-        }],
+        [
+          ['ready', 'prepare', 'start', 'ending'],
+          () => {
+            user = game.getUserByAuth(token);
+            console.log('user', user);
+            if (!user) {
+              return response.error.userNotRegister();
+            }
+            return response.send.welcome({
+              userId: user.id,
+              gameStatus: game.getStatus(),
+              count: user.getCount(),
+            });
+          },
+        ],
         ['result', () => {
           response.error.gameEndResulted();
         }],
+      ]);
+    },
+    [WS_CLIENT_GET_QUESTION]() {
+      game.condStatus([
+        ['idle', () => {
+          response.error.gameInIdle();
+        }],
+        ['ready', () => {
+          response.error.gameNotStart();
+        }],
         [['prepare', 'start'], () => {
-          if (user.userGame.isTimeout()) {
+          if (user.isTimeout()) {
             response.error.gameEndResulted();
             return;
           }
-          const nextQuestion = user.userGame.qaManager.getNextQuestion();
-          response.success({
-            id: nextQuestion.id,
-            question: nextQuestion.title,
-            options: nextQuestion.userGameAlreadyAnswered(),
-          });
-        }]
+          const nextQuiz = user.getNextQuiz();
+          response.send.question(nextQuiz);
+        }],
+        ['ending', () => {
+          response.error.gameEnding();
+        }],
+        ['result', () => {
+          response.error.gameEndResulted();
+        }],
       ]);
     },
-    [WS_CLIENT_SEND_ANSWER](payload) {
+    [WS_CLIENT_SEND_ANSWER]({
+      questionId, answerCode,
+      time: answerClientTime,
+    }) {
       game.condStatus([
         ['idle', () => {
-          response.error.gameNotStart();
+          response.error.gameInIdle();
         }],
         ['ending', () => {
           response.error.gameEnding();
@@ -98,7 +100,11 @@ const getResponseActions = (user = {
           response.error.gameEndResulted();
         }],
         [['prepare', 'start'], () => {
-          const answerResult = user.userGame.qaManager.answerQuestion();
+          const answerResult = user.answerQuestion(
+            questionId,
+            answerCode,
+            answerClientTime,
+          );
           if (answerResult.answered) {
             response.error.userGameAlreadyAnswered();
             return;
@@ -107,72 +113,52 @@ const getResponseActions = (user = {
             questionId: answerResult.questionId,
             answerCode: answerResult.answerCode,
             correct: answerResult.correct,
+            count: user.getCount(),
           });
-        }]
-      ]);
-    },
-    [WS_CLIENT_END](payload) {
-      game.condStatus([
-        ['result', () => {
-          response.error.gameEndResulted();
         }],
-        [['prepare', 'start'], () => {
-          const answerResult = user.userGame.qaManager.answerQuestion();
-          if (answerResult.answered) {
-            response.error.userGameAlreadyAnswered();
-            return;
-          }
-          response.success({
-            questionId: answerResult.questionId,
-            answerCode: answerResult.answerCode,
-            correct: answerResult.correct,
-            count: user.userGame.count,
-          });
-        }]
       ]);
     },
-  }
-};
+    // [WS_CLIENT_END](payload) {
+    //   game.condStatus([
+    //     ['result', () => {
+    //       response.error.gameEndResulted();
+    //     }],
+    //     [['prepare', 'start'], ( = {
+    //       endTime: 0,
+    //     }, type) => {
+    //       user.qaManager.end();
+    //       if (type === 'prepare') {
+    //         // log exception
+    //       }
+    //     }]
+    //   ]);
+    // },
+  };
+  ws.on('message', (msgStr) => {
+    console.log('get message: ', msgStr);
 
-wss.on('connection', (ws) => {
-  ws.on('message', function incoming(msgStr) {
     let message;
     try {
-      message = JSON.parse(msgStr);      
+      message = JSON.parse(msgStr);
     } catch (err) {
-      ws.send('unknow message');
-      return;
+      return response.error.badRequest();
     }
     const { type, payload } = message;
-    switch (type) {
-      case 1:
-        const userId = context.users[payload.token];
-        // send user Error if !userId
-        context.onlineUsers[payload.user] = 1;
-        ws.send(JSON.stringify({
-          userId,
-          count: {
-            total: 100,
-            wrong: 1,
-            correct: 99,
-          },
-        }));
-        break;
-      default: 
-        ws.send('not type');
+    const action = actions[type];
+    if (!action) {
+      return response.error.badRequest();
     }
-    console.log('received', typeof message);
-    console.log(message);
-  });
 
-  ws.on('error', function incoming(error) {
-    console.error('error', error);
+    action(payload);
   });
-
+  ws.on('error', () => {
+    if (user) {
+      user.offline();
+    }
+  });
   ws.on('headers', (...args) => {
     console.log('on headers', args);
   });
-
   ws.on('listening', (...args) => {
     console.log('on listening', args);
   });
@@ -180,8 +166,8 @@ wss.on('connection', (ws) => {
 
 wss.on('error', (err) => {
   console.error('wss error', err);
-})
+});
 
-server.listen('8000', function() {
+server.listen(config.port, () => {
   console.log('Server started!');
-})
+});

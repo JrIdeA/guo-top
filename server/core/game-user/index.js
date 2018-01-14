@@ -1,19 +1,19 @@
 const QuestionsManager = require('../questions/manager');
 const GameUserStatistic = require('./Statistics');
 
-function createGameUserGenerator(Game, Users) {
+function createGameUser(users, game) {
   const questions = QuestionsManager.getRandomQueue();
   const stat = new GameUserStatistic();
 
-  class GameUser {
+  return class GameUser {
     constructor(userId) {
-      this.userId = userId;
+      this.id = userId;
     }
     online() {
-      Users.online(this);
+      users.online(this);
     }
     offline() {
-      Users.offline(this);
+      users.offline(this);
     }
     getNextQuiz(getAnswerClientTime) {
       const currentQuestion = questions.current;
@@ -38,16 +38,34 @@ function createGameUserGenerator(Game, Users) {
       if (!target) return false;
       if (target.isCurrent()) {
         target.giveup();
-        return false;
+        return {
+          questionId,
+          answerCode,
+          answered: true,
+        };
       }
       const correct = target.answer(answerCode);
       correct ? stat.markCorrect() : stat.markWrong();
       stat.addAnswerLog({ 
         questionId, answerCode, answerClientTime
       });
-      return correct;
+      return {
+        questionId,
+        answerCode,
+        correct,
+      };
+    }
+    getCount() {
+      return {
+        total: stat.total,
+        correct: stat.correct,
+        wrong: stat.wrong,
+      };
+    }
+    isTimeout() {
+      return game.status.ending;
     }
   }
 }
 
-module.exports = createGameUserGenerator;
+module.exports = createGameUser;
