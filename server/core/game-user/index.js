@@ -1,8 +1,7 @@
-const QuestionsManager = require('../questions/manager');
 const GameUserStatistic = require('./statistics');
 
-function createGameUser(users, game) {
-  const questions = QuestionsManager.getRandomQueue();
+function createGameUser(game) {
+  const questions = game.getRandomQuestionsQueue();
   const stat = new GameUserStatistic();
 
   return class GameUser {
@@ -10,10 +9,10 @@ function createGameUser(users, game) {
       this.id = userId;
     }
     online() {
-      users.online(this);
+      game.onlineUser(this);
     }
     offline() {
-      users.offline(this);
+      game.offlineUser(this);
     }
     getNextQuiz(getAnswerClientTime) {
       const currentQuestion = questions.current;
@@ -27,7 +26,7 @@ function createGameUser(users, game) {
       }
 
       const nextQuestion = questions.next();
-      stat.addGetQuestionLog({ 
+      stat.addGetQuestionLog({
         questionId: nextQuestion.id,
         getAnswerClientTime,
       });
