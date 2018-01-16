@@ -8,6 +8,7 @@ class Game extends EventEmitter {
     this.config = config;
     this.initStatus();
     this.initScheduler();
+    this.initUsers();
   }
 }
 
