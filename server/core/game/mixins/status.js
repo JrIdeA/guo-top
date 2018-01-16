@@ -1,6 +1,7 @@
 const { isArray, each, isFunction } = require('lodash');
+const { logger } = require('../../utils');
 
-const GameStatusMixin = {
+const GameStatusProto = {
   initStatus() {
     this._status = 'idle';
 
@@ -13,6 +14,7 @@ const GameStatusMixin = {
         set(value) {
           if (value) {
             self._status = targetStatus;
+            self.emit('game:statusChange', targetStatus);
             self.emit(`status:${targetStatus}`);
           }
         },
@@ -42,9 +44,15 @@ const GameStatusMixin = {
       result: createStatusChangeHandle('result'),
     };
     this.onStatusChange = onStatusChange;
+    this.on('game:statusChange', (targetStatus) => {
+      logger.log(`[Game] status change to ${targetStatus}, at ${Date.now()}`);
+    });
   },
   getStatus() {
     return this._status;
+  },
+  setStatus(nextStatus) {
+    this.status[nextStatus] = true;
   },
   condStatus(conds) {
     each(conds, ([
@@ -64,4 +72,4 @@ const GameStatusMixin = {
   },
 };
 
-module.exports = GameStatusMixin;
+module.exports = GameStatusProto;

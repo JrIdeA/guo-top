@@ -1,5 +1,7 @@
 const http = require('http');
 const WebSocket = require('ws');
+const path = require('path');
+const fs = require('fs');
 const config = require('../config');
 const {
   WS_CLIENT_TICKET,
@@ -24,12 +26,23 @@ const wss = new WebSocket.Server({
 });
 
 // start scheduler
-const game = new Game(config.game);
+const questionsData = JSON.parse(fs.readFileSync(path.join(
+  __dirname, '../data/questions/index.json'
+)));
+const game = new Game(config.game, questionsData);
 
 wss.on('connection', (ws) => {
   const response = createWsReponse(ws);
   if (game.status.idle) {
     response.error.gameInIdle();
+  } else {
+    response.send.gameInfo({
+      status: game.getStatus(),
+      time: {
+        start: game.getStartTime(),
+        prepare: game.getPrepareSeconds(),
+      },
+    });
   }
 
   let user;
@@ -45,7 +58,6 @@ wss.on('connection', (ws) => {
           ['ready', 'prepare', 'start', 'ending'],
           () => {
             user = game.getUserByAuth(token);
-            console.log('user', user);
             if (!user) {
               return response.error.userNotRegister();
             }

@@ -34,7 +34,7 @@ const GameUsersProto = {
     delete this._onlineUsers[user.id];
   },
   getOnlineUserCount() {
-    return this._onlineUsers.length;
+    return Object.keys(this._onlineUsers).length;
   },
 };
 

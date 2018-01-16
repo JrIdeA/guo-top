@@ -1,6 +1,6 @@
 const CreateGameUser = require('./game-user/index');
 
-class UsersManager {
+export default class UsersManager {
   constructor(game) {
     this._game = game;
     this._tokenIdMap = {};
@@ -9,10 +9,10 @@ class UsersManager {
     this.GameUser = CreateGameUser(this);
   }
   _createUser(userId) {
-    return new this.GameUser(userId);  
+    return new this.GameUser(userId);
   }
   getUserByAuth(token) {
-    const userId = this._tokenIdMap;
+    const userId = this._tokenIdMap[token];
     if (!userId) {
       return undefined;
     }
@@ -33,5 +33,8 @@ class UsersManager {
   }
   offline(user) {
     delete this._onlineUsers[user.id];
+  }
+  getOnlineUserCount() {
+    return this._onlineUsers.length;
   }
 }

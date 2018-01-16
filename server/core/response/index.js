@@ -13,6 +13,7 @@ const {
 } = require('../../../shared/error');
 const {
   WS_SERVER_ERROR,
+  WS_SERVER_GAME_INFO,
   WS_SERVER_WELCOME,
   WS_SERVER_SEND_QUESTION,
   WS_SERVER_SEND_ANSWER_RESULT,
@@ -36,6 +37,7 @@ module.exports = function createWsReponse(ws) {
       welcome: sendSuccess(WS_SERVER_WELCOME),
       question: sendSuccess(WS_SERVER_SEND_QUESTION),
       answer: sendSuccess(WS_SERVER_SEND_ANSWER_RESULT),
+      gameInfo: sendSuccess(WS_SERVER_GAME_INFO),
     },
     error: {
       badRequest: sendError(ERROR_BAD_REQUEST),
