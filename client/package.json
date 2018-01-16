@@ -1,0 +1,32 @@
+{
+  "name": "guo-top-client",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "history": "^4.7.2",
+    "js-cookie": "^2.2.0",
+    "moment": "^2.20.1",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-redux": "^5.0.6",
+    "react-router": "^4.2.0",
+    "react-router-redux": "^4.0.8",
+    "react-scripts": "1.0.17",
+    "redux": "^3.7.2",
+    "redux-saga": "^0.16.0",
+    "rodal": "^1.6.3",
+    "ws": "^4.0.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "proxy": {
+    "/socket": {
+      "target": "ws://localhost:8000",
+      "ws": true
+    }
+  }
+}
