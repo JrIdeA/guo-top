@@ -31,6 +31,7 @@ const questionsData = JSON.parse(fs.readFileSync(path.join(
   __dirname, '../data/questions/index.json'
 )));
 const game = new Game(config.game, questionsData);
+game.registerUser('yejiren', 'abcdefg');
 
 wss.on('connection', (ws) => {
   const response = createWsReponse(ws);
@@ -62,11 +63,20 @@ wss.on('connection', (ws) => {
             if (!user) {
               return response.error.userNotRegister();
             }
-            return response.send.welcome({
+            user.online();
+            const status = game.getStatus();
+            const extendData = {};
+            if (status === 'ready') {
+              extendData.leftTime = game.getLeftStartTime();
+              extendData.startTime = game.getStartTime();
+            }
+            return response.send.welcome(Object.assign(extendData, {
               userId: user.id,
               gameStatus: game.getStatus(),
+              playtimeSeconds: game.getPlaytimeSeconds(),
+              onlineUser: game.getOnlineUserCount(),
               count: user.getCount(),
-            });
+            }));
           },
         ],
         ['result', () => {

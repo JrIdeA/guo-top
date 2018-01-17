@@ -1,4 +1,6 @@
+
 const CreateGameUser = require('../../game-user');
+const { logger } = require('../../utils');
 
 const GameUsersProto = {
   initUsers() {
@@ -29,9 +31,11 @@ const GameUsersProto = {
   },
   onlineUser(user) {
     this._onlineUsers[user.id] = user;
+    logger.debug('user online', user);
   },
   offlineUser(user) {
     delete this._onlineUsers[user.id];
+    logger.debug('user offline', user);
   },
   getOnlineUserCount() {
     return Object.keys(this._onlineUsers).length;

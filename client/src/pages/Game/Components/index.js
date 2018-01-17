@@ -4,7 +4,6 @@ import Modals from './Modals';
 
 export default class Game extends Component {
   componentWillMount() {
-    console.log('Game.props', this.props);
     this.props.ws.connect();
   }
   componentWillUnmount() {

@@ -26,7 +26,7 @@ const GameSchedulerProto = {
       deadtimeSeconds,
     } = defaults(this.config, {
       startTime: '',
-      readySeconds: 60,
+      readySeconds: 600,
       prepareSeconds: 3,
       playtimeSeconds: 60,
       deadtimeSeconds: 90,
@@ -41,6 +41,7 @@ const GameSchedulerProto = {
     invariant(prepareTime > 0, `game prepareTime invalid, parsed: ${prepareTime}`);
     invariant(deadTime > startTime, `game deadTime should after then startTime, deadTime: ${deadTime}, startTime: ${startTime}`);
 
+    this.playtimeSeconds = playtimeSeconds;
     this.readyTime = readyTime;
     this.prepareTime = prepareTime;
     this.startTime = startTime;
@@ -81,6 +82,12 @@ const GameSchedulerProto = {
   },
   getPrepareSeconds() {
     return this.prepareSeconds;
+  },
+  getPlaytimeSeconds() {
+    return this.playtimeSeconds;
+  },
+  getLeftStartTime() {
+    return this.startTime - Date.now();
   },
 };
 

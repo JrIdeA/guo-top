@@ -4,7 +4,7 @@ import Ready from './Ready';
 
 export default class GameStage extends Component {
   render() {
-    const { status } = this.props;
+    const { status } = this.props.game;
     let stage;
 
     if (status === 'ready') {

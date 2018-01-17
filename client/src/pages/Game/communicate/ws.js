@@ -5,11 +5,11 @@ import {
 } from '../../../shared/wstype';
 import { wsStatusToActionType } from './actionType';
 
-function geActionByMessage({ type, payload }) {
+function geActionByMessage({ type, data }) {
   const actionType = wsStatusToActionType(type);
   return {
     type: actionType,
-    payload,
+    payload: data,
   };
 }
 function geActionByError({ error }) {

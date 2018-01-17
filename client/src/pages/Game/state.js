@@ -1,6 +1,7 @@
 import { identity } from 'lodash';
 import { push } from 'react-router-redux';
-import { takeLatest, select, takeEvery, put } from 'redux-saga/effects';
+import { delay } from 'redux-saga';
+import { takeLatest, select, takeEvery, put, take, fork, call, cancel } from 'redux-saga/effects';
 import moment from 'moment';
 import { replaceChildNode } from '../../core';
 import {
@@ -15,6 +16,10 @@ import {
   WS_SERVER_SEND_ANSWER_RESULT,
 } from './communicate';
 
+function createAction(type) {
+  return (payload) => ({ type, payload });
+}
+
 export const root = 'game';
 export const initState = {
   userId: '',
@@ -23,6 +28,7 @@ export const initState = {
     count: '',
     startTime: 0,
     playtimeSeconds: 0,
+    prepareCountdown: 0,
   },
   question: {
     id: 0,
@@ -31,7 +37,8 @@ export const initState = {
     correct: null,
   },
   control: {
-
+    now: Date.now(),
+    startTime: 0,
   },
   modals: {
     gameInIdle: false,
@@ -41,13 +48,29 @@ export const initState = {
 };
 export const computed = {
   startTimeFormatted(state) {
-    return moment(state.game.startTime).format('YYYY-MM-DD HH:mm:ss');
-  }
+    return moment(state.game.game.startTime).format('YYYY-MM-DD HH:mm:ss');
+  },
+  leftStartSeconds(state) {
+    if (!state.game.control.startTime) return 0;
+    return Math.floor((state.game.control.startTime - state.game.control.now) / 1000);
+  } 
 };
+export const actionTypes = {
+  startPrepareCountdown: 'startPrepareCountdown',
+  stopPrepareCountdown: 'stopPrepareCountdown',
+  tickPrepareCountdown: 'tickPrepareCountdown',
+}
 export const actions = {
   // pushToIndex: 'game/pushToIndex',
 };
 export const reducers = {
+  [actionTypes.tickPrepareCountdown](state) {
+    return replaceChildNode(
+      state, 
+      'control.now',
+      Date.now(),
+    );
+  },
   [ERROR_GAME_IN_IDLE](state, payload) {
     return replaceChildNode(
       state, 
@@ -55,22 +78,29 @@ export const reducers = {
       true
     );
   },
-  [ERROR_USER_NOT_REGISTER](state, payload) {
-    return replaceChildNode(
-      state, 
-      'modals.userNotRegister',
-      true
-    );
-  },
-  [WS_SERVER_WELCOME](state, { userId, gameStatus, count }) {
+  [WS_SERVER_WELCOME](state, payload) {
+    const { userId, gameStatus, count, leftTime, startTime, playtimeSeconds } = payload;
     return {
       ...state,
       userId,
       game: {
         status: gameStatus,
         count: count,
+        startTime,
+        playtimeSeconds,
       },
+      control: {
+        ...state.control,
+        startTime: leftTime + Date.now(),
+      }
     };
+  },
+  [ERROR_USER_NOT_REGISTER](state, payload) {
+    return replaceChildNode(
+      state, 
+      'modals.userNotRegister',
+      true
+    );
   },
   [WS_SERVER_SEND_QUESTION](state, { id, question, options }) {
     return {
@@ -107,6 +137,11 @@ export const sagas = [
     const ws = yield select(state => state.game.ws);
     ws.sendTicket();
   }),
+  takeLatest(WS_SERVER_WELCOME, function* ({ payload: { gameStatus, leftTime } }) {
+    if (gameStatus === 'ready' && leftTime) {
+      yield put(createAction(actionTypes.startPrepareCountdown)());
+    }
+  }),
   takeLatest(ERROR_BAD_REQUEST, function* () {
     console.error('client send a bad request.');
   }),
@@ -114,6 +149,24 @@ export const sagas = [
     const state = yield select();
     // ws.getNextQuiz();
   }),
+  function* watchTimer() {
+    while (yield take(actionTypes.startPrepareCountdown)) {
+      const timeTickTask = yield fork(function* timeTick() {
+        try {
+          while (true) {
+            const startTime = yield select(state => state.game.control.startTime);
+            yield put(createAction(actionTypes.tickPrepareCountdown)())
+            if (Date.now() > startTime) {
+              yield put(createAction(actionTypes.stopPrepareCountdown)());
+            }
+            yield call(delay, 1000);
+          }
+        } catch (error) {console.error(error)} // eslint-disable-line
+      });
+      yield take(actionTypes.stopPrepareCountdown);
+      yield cancel(timeTickTask);
+    }
+  }(),
 ];
 const flow = {
 

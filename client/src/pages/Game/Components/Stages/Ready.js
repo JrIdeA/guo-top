@@ -5,7 +5,7 @@ export default class GameStageReady extends Component {
     return (
       <div>
         <h1>百万榛果冲顶大会</h1>
-        <p>游戏开始将开始于{this.props.startTimeFormatted}</p>
+        <p>游戏将于 {this.props.startTimeFormatted} 开始，倒计时 {this.props.leftStartSeconds} 秒</p>
         <div>
           <h3>规则：</h3>
           <p>你需要在 {this.props.game.playtimeSeconds}s 内进行答题，题目均为单选题。</p>
