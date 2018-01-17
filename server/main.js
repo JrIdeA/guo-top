@@ -2,6 +2,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
 const fs = require('fs');
+const { logger } = require('./core/utils');
 const config = require('../config');
 const {
   WS_CLIENT_TICKET,
@@ -147,17 +148,19 @@ wss.on('connection', (ws) => {
     // },
   };
   ws.on('message', (msgStr) => {
-    console.log('get message: ', msgStr);
+    logger.debug('get message', msgStr);
 
     let message;
     try {
       message = JSON.parse(msgStr);
     } catch (err) {
+      logger.debug('parse message error', msgStr);
       return response.error.badRequest();
     }
     const { type, payload } = message;
     const action = actions[type];
     if (!action) {
+      logger.debug('not response action, type is', type);
       return response.error.badRequest();
     }
 

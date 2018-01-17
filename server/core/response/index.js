@@ -17,7 +17,7 @@ const {
   WS_SERVER_WELCOME,
   WS_SERVER_SEND_QUESTION,
   WS_SERVER_SEND_ANSWER_RESULT,
-} = require('../../../shared/error');
+} = require('../../../shared/wstype');
 
 module.exports = function createWsReponse(ws) {
   const send = (messageJson) => {

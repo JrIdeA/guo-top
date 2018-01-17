@@ -7,6 +7,9 @@ import {
   ws,
   ERROR_GAME_IN_IDLE,
   ERROR_BAD_REQUEST,
+  ERROR_USER_NOT_REGISTER,
+  WS_CLIENT_SEND_ANSWER,
+  WS_SERVER_GAME_INFO,
   WS_SERVER_WELCOME,
   WS_SERVER_SEND_QUESTION,
   WS_SERVER_SEND_ANSWER_RESULT,
@@ -32,6 +35,7 @@ export const initState = {
   },
   modals: {
     gameInIdle: false,
+    userNotRegister: false,
   },
   ws,
 };
@@ -48,6 +52,13 @@ export const reducers = {
     return replaceChildNode(
       state, 
       'modals.gameInIdle',
+      true
+    );
+  },
+  [ERROR_USER_NOT_REGISTER](state, payload) {
+    return replaceChildNode(
+      state, 
+      'modals.userNotRegister',
       true
     );
   },
@@ -91,13 +102,13 @@ export const reducers = {
     };
   },
 };
-export const saga = [
-  takeLatest(WS_SERVER_WELCOME, function* ({ userId, gameStatus, count }) {
-  }),
-  takeLatest(ERROR_GAME_IN_IDLE, function* () {
+export const sagas = [
+  takeLatest(WS_SERVER_GAME_INFO, function* ({ userId, gameStatus }) {
+    const ws = yield select(state => state.game.ws);
+    ws.sendTicket();
   }),
   takeLatest(ERROR_BAD_REQUEST, function* () {
-    console.error('client send a bad request.')
+    console.error('client send a bad request.');
   }),
   takeLatest(WS_SERVER_SEND_ANSWER_RESULT, function* () {
     const state = yield select();

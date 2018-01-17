@@ -1,5 +1,8 @@
 import Cookies from 'js-cookie';
 import { logger } from '../../../core';
+import {
+  WS_CLIENT_TICKET,
+} from '../../../shared/wstype';
 import { wsStatusToActionType } from './actionType';
 
 function geActionByMessage({ type, payload }) {
@@ -57,7 +60,10 @@ const gameWs = {
   sendTicket() {
     // const token = Cookies.get('token');
     const token = 'abcdefg';
-    this.send({ token });
+    this.send({ 
+      type: WS_CLIENT_TICKET, 
+      payload: { token } 
+    });
   },
 };
 
