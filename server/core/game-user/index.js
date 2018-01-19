@@ -56,7 +56,7 @@ function createGameUser(game) {
         };
       }
       const correct = target.answer(answerCode);
-      correct ? stat.markCorrect() : stat.markWrong();
+      correct ? stat.markCorrect(target.isSpecial()) : stat.markWrong(target.isSpecial());
       stat.addAnswerLog({
         questionId, answerCode, answerClientTime,
       });
@@ -71,6 +71,7 @@ function createGameUser(game) {
         total: stat.total,
         correct: stat.correct,
         wrong: stat.wrong,
+        point: stat.point,
       };
     }
     isTimeout() {

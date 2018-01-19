@@ -10,10 +10,18 @@ export default class StagesStart extends Component {
       </div>
     );
   }
+  renderStatistics() {
+    return (
+      <div>
+        当前得分：{this.props.count.point}
+      </div>
+    );
+  }
   render() {
     return (
       <div>
         {this.renderGameCountdown()}
+        {this.renderStatistics()}
         <QA 
           {...this.props.question}
           answerQuestion={this.props.answerQuestion}

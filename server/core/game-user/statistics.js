@@ -3,16 +3,21 @@ class GameUserStatistic {
     this.total = 0;
     this.correct = 0;
     this.wrong = 0;
+    this.point = 0;
     this.answerAll = false;
     this.answerLog = {};
   }
-  markWrong() {
+  markWrong(specialAnswer) {
     this.total += 1;
     this.wrong += 1;
+    if (!specialAnswer) {
+      this.point -= 1;
+    }
   }
   markCorrect() {
     this.total += 1;
     this.correct += 1;
+    this.point += 1;
   }
   markAnsweredAll() {
     this.answerAll = true;

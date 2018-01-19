@@ -30,6 +30,9 @@ class UserQuestions {
         if (!question.id) return false;
         return questions.current.id === question.id;
       },
+      isSpecial() {
+        return !!question._data.special;
+      },
       getQuiz() {
         if (!question.id) return null;
         const options = shuffle(map(quesionData.options, (answer, code) => ({

@@ -34,6 +34,7 @@ export const initState = {
     total: 0,
     wrong: 0,
     correct: 0,
+    point: 0,
   },
   question: {
     id: 0,
