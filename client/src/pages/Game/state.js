@@ -62,9 +62,10 @@ export const computed = {
   leftStartSeconds(state) {
     if (!state.game.control.startTime) return 0;
     return Math.floor((state.game.control.startTime - state.game.control.now) / 1000);
-  } 
+  }
 };
 export const actionTypes = {
+  completeContraCheats: 'completeContraCheats',
   startPrepareCountdown: 'startPrepareCountdown',
   stopPrepareCountdown: 'stopPrepareCountdown',
   tickPrepareCountdown: 'tickPrepareCountdown',
@@ -75,10 +76,12 @@ export const actionTypes = {
   updateEndCountdown: 'updateEndCountdown',
   getQuestion: 'getQuestion',
   answerQuestion: 'answerQuestion',
+  answerQuestionByIndex: 'answerQuestionByIndex',
 }
 export const actions = {
-  // pushToIndex: 'game/pushToIndex',
+  completeContraCheats: createAction(actionTypes.completeContraCheats),
   answerQuestion: createAction(actionTypes.answerQuestion),
+  answerQuestionByIndex: createAction(actionTypes.answerQuestionByIndex),
 };
 export const reducers = {
   [actionTypes.tickPrepareCountdown](state) {
@@ -164,7 +167,7 @@ export const reducers = {
   },
   [actionTypes.answerQuestion](state, answerCode) {
     return replaceChildNode(state, 'question.answerCode', answerCode);
-  }
+  },
 };
 export const sagas = [
   takeLatest(WS_SERVER_GAME_INFO, function* ({ userId, gameStatus }) {
@@ -249,6 +252,11 @@ export const sagas = [
       answerCode,
     } = yield select(state => state.game.question);
     ws.sendAnswer(questionId, answerCode);
+  }),
+  takeLatest(actionTypes.answerQuestionByIndex, function* answerQuestionByIndex({ payload: index }) {
+    const answerOption = yield select(state => state.game.question.options[index]);
+    if (!answerOption) return;
+    yield put(actions.answerQuestion(answerOption.code));
   }),
 ];
 const flow = {
