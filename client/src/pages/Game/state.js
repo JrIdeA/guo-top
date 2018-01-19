@@ -192,6 +192,9 @@ export const sagas = [
   takeLatest(WS_SERVER_SEND_ANSWER_RESULT, function* () {
     yield put(createAction(actionTypes.getQuestion)());
   }),
+  takeLatest(WS_SERVER_SEND_ANSWERED_ALL, function* () {
+    yield put(createAction(actionTypes.stopGameCountdown)());
+  }),
   function* watchPrepareCountdown() {
     while (yield take(actionTypes.startPrepareCountdown)) {
       const timeTickTask = yield fork(function* timeTick() {
