@@ -34,13 +34,21 @@ function createGameUser(game) {
     }
     answerQuiz(questionId, answerCode, answerClientTime) {
       const target = questions.get(questionId);
-      if (!target) return false;
-      if (target.isCurrent()) {
+      if (!target) {
+        return {
+          questionId,
+          answerCode,
+          answered: true,
+          correct: false,
+        };
+      }
+      if (!target.isCurrent() || target.isAnswered()) {
         target.giveup();
         return {
           questionId,
           answerCode,
           answered: true,
+          correct: false,
         };
       }
       const correct = target.answer(answerCode);

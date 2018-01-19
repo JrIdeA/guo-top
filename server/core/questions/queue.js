@@ -3,6 +3,7 @@ const { shuffle, map } = require('lodash');
 class UserQuestions {
   constructor(questionsData) {
     this.questionsData = questionsData;
+    console.log(this.questionsData);
     this.current = this._createQuestion(null);
     this.index = -1;
     this.historys = {};
@@ -18,12 +19,13 @@ class UserQuestions {
         question._correct = false;
       },
       answer(answerCode) {
-        if (!question.id) return;
+        if (!question.id) return false;
         question._correct = question._data.answer == answerCode;
+        return question._correct;
       },
       isAnswered() {
-        if (!question.id) return false;
-        return question._correct == null;
+        if (!question.id) return true;
+        return question._correct != null;
       },
       isCurrent() {
         if (!question.id) return false;
@@ -45,6 +47,9 @@ class UserQuestions {
 
     return question;
   }
+  get(questionId) {
+    return this.historys[questionId];
+  }
   next() {
     this.index += 1;
     const questionData = this.questionsData[this.index];
@@ -52,6 +57,7 @@ class UserQuestions {
 
     const question = this._createQuestion(questionData);
     this.historys[question.id] = question;
+    this.current = question;
     return question;
   }
   getResultCount() {

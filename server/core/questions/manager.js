@@ -7,15 +7,17 @@ const {
 function normalizeQuestionsData(questionsData) {
   const isValidQuestion = (questionData) => {
     if (!isPlainObject(questionData)) return false;
-    const { question, options, correct } = questionData;
+    const { question, options, answer } = questionData;
     if (!isString(question) || !question.length) return false;
     if (!isPlainObject(options)) return false;
     const optionsLen = Object.keys(options).length;
     if (optionsLen < 2) return false;
-    if (isNil(correct) || !options[correct]) return false;
+    if (isNil(answer) || !options[answer]) return false;
     return true;
   };
-  return questionsData.filter(isValidQuestion);
+  return questionsData.filter(isValidQuestion).map((questionData, index) => (Object.assign({
+    id: index + 1,
+  }, questionData)));
 }
 
 class QuestionsManager {

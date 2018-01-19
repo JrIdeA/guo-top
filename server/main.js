@@ -123,7 +123,7 @@ wss.on('connection', (ws) => {
           response.error.gameEndResulted();
         }],
         [['prepare', 'start'], () => {
-          const answerResult = user.answerQuestion(
+          const answerResult = user.answerQuiz(
             questionId,
             answerCode,
             answerClientTime,
@@ -132,7 +132,7 @@ wss.on('connection', (ws) => {
             response.error.userGameAlreadyAnswered();
             return;
           }
-          response.success({
+          response.send.answer({
             questionId: answerResult.questionId,
             answerCode: answerResult.answerCode,
             correct: answerResult.correct,
