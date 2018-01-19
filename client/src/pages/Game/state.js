@@ -3,12 +3,14 @@ import { push, replace } from 'react-router-redux';
 import { delay } from 'redux-saga';
 import { takeLatest, select, takeEvery, put, take, fork, call, cancel } from 'redux-saga/effects';
 import moment from 'moment';
+import { toast } from 'react-toastify';
 import { replaceChildNode } from '../../core';
 import {
   ws,
   ERROR_GAME_IN_IDLE,
   ERROR_BAD_REQUEST,
   ERROR_USER_NOT_REGISTER,
+  ERROR_USRE_ALREADY_ANSWERED,
   WS_CLIENT_SEND_ANSWER,
   WS_SERVER_GAME_INFO,
   WS_SERVER_WELCOME,
@@ -34,6 +36,7 @@ export const initState = {
     id: 0,
     question: '',
     options: [],
+    answerCode: undefined,
     correct: null,
   },
   control: {
@@ -66,9 +69,11 @@ export const actionTypes = {
   startGame: 'startGame',
   updateEndCountdown: 'updateEndCountdown',
   getQuestion: 'getQuestion',
+  answerQuestion: 'answerQuestion',
 }
 export const actions = {
   // pushToIndex: 'game/pushToIndex',
+  answerQuestion: createAction(actionTypes.answerQuestion),
 };
 export const reducers = {
   [actionTypes.tickPrepareCountdown](state) {
@@ -144,6 +149,9 @@ export const reducers = {
   [actionTypes.tickGameCountdown](state, nextEndCountdown) {
     return replaceChildNode(state, 'control.endCountdown', nextEndCountdown);
   },
+  [actionTypes.answerQuestion](state, answerCode) {
+    return replaceChildNode(state, 'question.answerCode', answerCode);
+  }
 };
 export const sagas = [
   takeLatest(WS_SERVER_GAME_INFO, function* ({ userId, gameStatus }) {
@@ -162,6 +170,12 @@ export const sagas = [
   }),
   takeLatest(ERROR_BAD_REQUEST, function* () {
     console.error('client send a bad request.');
+  }),
+  takeLatest(ERROR_USRE_ALREADY_ANSWERED, function* () {
+    toast('该题已经答过啦~', {
+      type: 'error',
+      autoClose: 3000,
+    });
   }),
   takeLatest(WS_SERVER_SEND_ANSWER_RESULT, function* () {
     const state = yield select();
@@ -213,6 +227,13 @@ export const sagas = [
   }),
   takeLatest(actionTypes.getQuestion, function* getQuestion() {
     ws.getQuestion();
+  }),
+  takeLatest(actionTypes.answerQuestion, function* answerQuestion() {
+    const {
+      id: questionId,
+      answerCode,
+    } = yield select(state => state.game.question);
+    ws.sendAnswer(questionId, answerCode);
   }),
 ];
 const flow = {

@@ -3,17 +3,18 @@ import { logger } from '../../../core';
 import {
   WS_CLIENT_TICKET,
   WS_CLIENT_GET_QUESTION,
+  WS_CLIENT_SEND_ANSWER,
 } from '../../../shared/wstype';
 import { wsStatusToActionType } from './actionType';
 
-function geActionByMessage({ type, data }) {
+function getActionByMessage({ type, data }) {
   const actionType = wsStatusToActionType(type);
   return {
     type: actionType,
     payload: data,
   };
 }
-function geActionByError({ error }) {
+function getActionByError({ error }) {
   const actionType = wsStatusToActionType(error, true);
   return {
     type: actionType,
@@ -39,9 +40,9 @@ const gameWs = {
       logger.log('ws: get message', e.data);
       const data = decodeMessage(e.data);
       if (data.error) {
-        gameWs.dispatch(geActionByError(data));
+        gameWs.dispatch(getActionByError(data));
       } else if (data.type) {
-        gameWs.dispatch(geActionByMessage(data));
+        gameWs.dispatch(getActionByMessage(data));
       }
     });
     ws.addEventListener('error', (e) => {
@@ -71,6 +72,16 @@ const gameWs = {
       type: WS_CLIENT_GET_QUESTION,
     });
   },
+  sendAnswer(questionId, answerCode) {
+    this.send({
+      type: WS_CLIENT_SEND_ANSWER,
+      payload: {
+        questionId,
+        answerCode,
+        time: Date.now(),
+      },
+    })
+  }
 };
 
 export function initWs(dispatch) {

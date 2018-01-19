@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { ToastContainer } from 'react-toastify';
 import Stage from './Stages';
 import Modals from './Modals';
 
@@ -14,6 +15,7 @@ export default class Game extends Component {
       <div>
         <Stage {...this.props} />
         <Modals {...this.props} />
+        <ToastContainer />
       </div>
     );
   };
