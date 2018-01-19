@@ -3,6 +3,7 @@ class GameUserStatistic {
     this.total = 0;
     this.correct = 0;
     this.wrong = 0;
+    this.answerAll = false;
     this.answerLog = {};
   }
   markWrong() {
@@ -12,6 +13,9 @@ class GameUserStatistic {
   markCorrect() {
     this.total += 1;
     this.correct += 1;
+  }
+  markAnsweredAll() {
+    this.answerAll = true;
   }
   addGetQuestionLog({ questionId, getQuestionClientTime }) {
     this.answerLog[questionId] = {

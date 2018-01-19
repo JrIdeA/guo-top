@@ -8,3 +8,4 @@ exports.WS_SERVER_GAME_INFO = 'game_info' // 2;
 exports.WS_SERVER_WELCOME = 'welcome' // 3;
 exports.WS_SERVER_SEND_QUESTION = 'send_question' // 4;
 exports.WS_SERVER_SEND_ANSWER_RESULT = 'send_answer_result' // 5;
+exports.WS_SERVER_SEND_ANSWERED_ALL = 'send_answered_all' // 5;

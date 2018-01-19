@@ -1,5 +1,3 @@
-import { identity } from 'lodash';
-import { push, replace } from 'react-router-redux';
 import { delay } from 'redux-saga';
 import { takeLatest, select, takeEvery, put, take, fork, call, cancel } from 'redux-saga/effects';
 import moment from 'moment';
@@ -16,6 +14,7 @@ import {
   WS_SERVER_WELCOME,
   WS_SERVER_SEND_QUESTION,
   WS_SERVER_SEND_ANSWER_RESULT,
+  WS_SERVER_SEND_ANSWERED_ALL,
 } from './communicate';
 
 function createAction(type) {
@@ -27,10 +26,14 @@ export const initState = {
   userId: '',
   game: {
     status: '',
-    count: '',
     startTime: 0,
     playtimeSeconds: 0,
     prepareCountdown: 0,
+  },
+  count: {
+    total: 0,
+    wrong: 0,
+    correct: 0,
   },
   question: {
     id: 0,
@@ -43,6 +46,7 @@ export const initState = {
     now: Date.now(),
     startTime: 0,
     endCountdown: 0,
+    answeredAll: false,
   },
   modals: {
     gameInIdle: false,
@@ -104,7 +108,8 @@ export const reducers = {
       control: {
         ...state.control,
         startTime: leftTime + Date.now(),
-      }
+      },
+      count,
     };
   },
   [ERROR_USER_NOT_REGISTER](state, payload) {
@@ -143,6 +148,13 @@ export const reducers = {
       count,
     };
   },
+  [WS_SERVER_SEND_ANSWERED_ALL](state) {
+    return replaceChildNode(
+      state, 
+      'control.answeredAll',
+      true
+    );
+  },
   [actionTypes.updateEndCountdown](state, nextEndCountdown) {
     return replaceChildNode(state, 'control.endCountdown', nextEndCountdown);
   },
@@ -178,8 +190,7 @@ export const sagas = [
     });
   }),
   takeLatest(WS_SERVER_SEND_ANSWER_RESULT, function* () {
-    const state = yield select();
-    // ws.getNextQuiz();
+    yield put(createAction(actionTypes.getQuestion)());
   }),
   function* watchPrepareCountdown() {
     while (yield take(actionTypes.startPrepareCountdown)) {

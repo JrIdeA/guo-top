@@ -3,7 +3,6 @@ const { shuffle, map } = require('lodash');
 class UserQuestions {
   constructor(questionsData) {
     this.questionsData = questionsData;
-    console.log(this.questionsData);
     this.current = this._createQuestion(null);
     this.index = -1;
     this.historys = {};

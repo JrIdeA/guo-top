@@ -16,7 +16,7 @@ function createGameUser(game) {
     }
     getNextQuiz(getQuestionClientTime) {
       const currentQuestion = questions.current;
-      if (!currentQuestion && currentQuestion.isAnswered()) {
+      if (currentQuestion && !currentQuestion.isAnswered()) {
         currentQuestion.giveup();
         stat.markWrong();
         stat.addAnswerLog({
@@ -26,6 +26,10 @@ function createGameUser(game) {
       }
 
       const nextQuestion = questions.next();
+      if (!nextQuestion) {
+        stat.markAnsweredAll();
+        return null;
+      }
       stat.addGetQuestionLog({
         questionId: nextQuestion.id,
         getQuestionClientTime,

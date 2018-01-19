@@ -98,6 +98,10 @@ wss.on('connection', (ws) => {
             return;
           }
           const nextQuiz = user.getNextQuiz();
+          if (!nextQuiz) {
+            response.send.answeredAll();
+            return;
+          }
           response.send.question(nextQuiz);
         }],
         ['ending', () => {
