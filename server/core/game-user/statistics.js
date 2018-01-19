@@ -13,7 +13,7 @@ class GameUserStatistic {
     this.total += 1;
     this.correct += 1;
   }
-  addGetQuestionLog({ questionId, getAnswerClientTime }) {
+  addGetQuestionLog({ questionId, getQuestionClientTime }) {
     this.answerLog[questionId] = {
       getQuestionClientTime,
       getQuestionServerTime: Date.now(),

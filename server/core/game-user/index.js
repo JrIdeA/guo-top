@@ -14,9 +14,9 @@ function createGameUser(game) {
     offline() {
       game.offlineUser(this);
     }
-    getNextQuiz(getAnswerClientTime) {
+    getNextQuiz(getQuestionClientTime) {
       const currentQuestion = questions.current;
-      if (!currentQuestion.isAnswered()) {
+      if (!currentQuestion && currentQuestion.isAnswered()) {
         currentQuestion.giveup();
         stat.markWrong();
         stat.addAnswerLog({
@@ -28,7 +28,7 @@ function createGameUser(game) {
       const nextQuestion = questions.next();
       stat.addGetQuestionLog({
         questionId: nextQuestion.id,
-        getAnswerClientTime,
+        getQuestionClientTime,
       });
       return nextQuestion.getQuiz();
     }
@@ -62,7 +62,9 @@ function createGameUser(game) {
       };
     }
     isTimeout() {
-      return game.status.ending;
+      // return game.status.ending;
+      // TODO
+      return false;
     }
   };
 }

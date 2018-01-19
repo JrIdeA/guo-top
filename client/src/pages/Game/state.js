@@ -1,5 +1,5 @@
 import { identity } from 'lodash';
-import { push } from 'react-router-redux';
+import { push, replace } from 'react-router-redux';
 import { delay } from 'redux-saga';
 import { takeLatest, select, takeEvery, put, take, fork, call, cancel } from 'redux-saga/effects';
 import moment from 'moment';
@@ -39,6 +39,7 @@ export const initState = {
   control: {
     now: Date.now(),
     startTime: 0,
+    endCountdown: 0,
   },
   modals: {
     gameInIdle: false,
@@ -59,6 +60,12 @@ export const actionTypes = {
   startPrepareCountdown: 'startPrepareCountdown',
   stopPrepareCountdown: 'stopPrepareCountdown',
   tickPrepareCountdown: 'tickPrepareCountdown',
+  startGameCountdown: 'startGameCountdown',
+  stopGameCountdown: 'stopGameCountdown',
+  tickGameCountdown: 'tickGameCountdown',
+  startGame: 'startGame',
+  updateEndCountdown: 'updateEndCountdown',
+  getQuestion: 'getQuestion',
 }
 export const actions = {
   // pushToIndex: 'game/pushToIndex',
@@ -131,6 +138,12 @@ export const reducers = {
       count,
     };
   },
+  [actionTypes.updateEndCountdown](state, nextEndCountdown) {
+    return replaceChildNode(state, 'control.endCountdown', nextEndCountdown);
+  },
+  [actionTypes.tickGameCountdown](state, nextEndCountdown) {
+    return replaceChildNode(state, 'control.endCountdown', nextEndCountdown);
+  },
 };
 export const sagas = [
   takeLatest(WS_SERVER_GAME_INFO, function* ({ userId, gameStatus }) {
@@ -140,7 +153,12 @@ export const sagas = [
   takeLatest(WS_SERVER_WELCOME, function* ({ payload: { gameStatus, leftTime } }) {
     if (gameStatus === 'ready' && leftTime) {
       yield put(createAction(actionTypes.startPrepareCountdown)());
+    } else if (gameStatus === 'start') {
+      yield put(createAction(actionTypes.startGame)());
     }
+  }),
+  takeLatest(WS_SERVER_SEND_QUESTION, function* ({ payload: { id, options, question } }) {
+    yield put(createAction(actionTypes.startGameCountdown)());
   }),
   takeLatest(ERROR_BAD_REQUEST, function* () {
     console.error('client send a bad request.');
@@ -149,7 +167,7 @@ export const sagas = [
     const state = yield select();
     // ws.getNextQuiz();
   }),
-  function* watchTimer() {
+  function* watchPrepareCountdown() {
     while (yield take(actionTypes.startPrepareCountdown)) {
       const timeTickTask = yield fork(function* timeTick() {
         try {
@@ -167,6 +185,35 @@ export const sagas = [
       yield cancel(timeTickTask);
     }
   }(),
+  function* watchGameCountdown() {
+    while (yield take(actionTypes.startGameCountdown)) {
+      const tickerMs = 300;
+      const timeTickTask = yield fork(function* timeTick() {
+        try {
+          while (true) {
+            const nextEndCountdown = (yield select(state => state.game.control.endCountdown)) - tickerMs;
+            yield put(createAction(actionTypes.tickGameCountdown)(nextEndCountdown))
+            if (!(nextEndCountdown > 0)) {
+              yield put(createAction(actionTypes.stopGameCountdown)());
+            }
+            yield call(delay, tickerMs);
+          }
+        } catch (error) {console.error(error)} // eslint-disable-line
+      });
+      yield take(actionTypes.stopGameCountdown);
+      yield cancel(timeTickTask);
+    }
+  }(),
+  takeLatest(actionTypes.startGame, function* startGame() {
+    // TODO start time and left Time checked.
+    const updateEndCountdown = (yield select(state => state.game.game.playtimeSeconds)) * 1000;
+    yield put(createAction(actionTypes.updateEndCountdown)(updateEndCountdown));
+    yield put(createAction(actionTypes.getQuestion)());
+    yield put(createAction(actionTypes.startGameCountdown)());
+  }),
+  takeLatest(actionTypes.getQuestion, function* getQuestion() {
+    ws.getQuestion();
+  }),
 ];
 const flow = {
 

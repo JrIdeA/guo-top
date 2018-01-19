@@ -2,6 +2,7 @@ import Cookies from 'js-cookie';
 import { logger } from '../../../core';
 import {
   WS_CLIENT_TICKET,
+  WS_CLIENT_GET_QUESTION,
 } from '../../../shared/wstype';
 import { wsStatusToActionType } from './actionType';
 
@@ -63,6 +64,11 @@ const gameWs = {
     this.send({ 
       type: WS_CLIENT_TICKET, 
       payload: { token } 
+    });
+  },
+  getQuestion() {
+    this.send({
+      type: WS_CLIENT_GET_QUESTION,
     });
   },
 };
