@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Joining from './Joining';
 import Ready from './Ready';
-import Question from './Question';
+import Start from './Start';
 import AnsweredAll from './AnsweredAll';
 
 export default class GameStage extends Component {
@@ -14,7 +14,7 @@ export default class GameStage extends Component {
     } else if (status === 'start') {
       stage = answeredAll ?
         <AnsweredAll {...this.props} /> :
-        <Question {...this.props} />;
+        <Start {...this.props} />;
     } else {
       stage = <Joining {...this.props} />
     }
