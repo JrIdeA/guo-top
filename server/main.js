@@ -68,11 +68,14 @@ wss.on('connection', (ws) => {
             if (status === 'ready') {
               extendData.leftTime = game.getLeftStartTime();
               extendData.startTime = game.getStartTime();
+            } else if (status === 'start') {
+              user.giveupCurrentQuizIfNotAnswer();
             }
             return response.send.welcome(Object.assign(extendData, {
               userId: user.id,
               gameStatus: game.getStatus(),
               playtimeSeconds: game.getPlaytimeSeconds(),
+              leftPlaytimeSeconds: user.getLeftPlaytimeSeconds(),
               onlineUser: game.getOnlineUserCount(),
               count: user.getCount(),
             }));

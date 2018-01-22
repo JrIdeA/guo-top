@@ -1,3 +1,5 @@
+const { values } = require('lodash');
+
 class GameUserStatistic {
   constructor() {
     this.total = 0;
@@ -31,9 +33,21 @@ class GameUserStatistic {
   addAnswerLog({ questionId, answerCode, answerClientTime, giveup }) {
     const log = this.answerLog[questionId];
     if (!log) return;
+    log.giveup = giveup;
     log.answerCode = answerCode;
     log.answerClientTime = answerClientTime;
     log.answerServerTime = Date.now();
+    log.usedServerTime = log.answerServerTime - log.getQuestionServerTime;
+  }
+  getUsedSeconds() {
+    return values(this.answerLog).reduce((p, { usedServerTime }) => {
+      usedServerTime = +usedServerTime;
+      if (Number.isNaN(usedServerTime)) {
+        return p;
+      }
+      console.log('usedServerTime', usedServerTime);
+      return p + (usedServerTime / 1000);
+    }, 0);
   }
 }
 

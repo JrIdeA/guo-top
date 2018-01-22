@@ -7,6 +7,7 @@ function createGameUser(game) {
   return class GameUser {
     constructor(userId) {
       this.id = userId;
+      this.clientEndedGame = false;
     }
     online() {
       game.onlineUser(this);
@@ -78,6 +79,26 @@ function createGameUser(game) {
       // return game.status.ending;
       // TODO
       return false;
+    }
+    giveupCurrentQuizIfNotAnswer() {
+      const current = questions.getCurrent();
+      if (current && current.id && !current.isAnswered()) {
+        current.giveup();
+        stat.markWrong();
+        stat.addAnswerLog({
+          questionId: current.id,
+          giveup: true,
+        });
+      }
+    }
+    getLeftPlaytimeSeconds() {
+      if (this.endGameByClient) return -1;
+      const playtimeSeconds = game.getPlaytimeSeconds();
+      const usedSeconds = stat.getUsedSeconds();
+      return playtimeSeconds - usedSeconds;
+    }
+    endGameByClient() {
+      this.clientEndedGame = true;
     }
   };
 }

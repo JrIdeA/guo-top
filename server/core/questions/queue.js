@@ -62,6 +62,9 @@ class UserQuestions {
     this.current = question;
     return question;
   }
+  getCurrent() {
+    return this.current;
+  }
   getResultCount() {
     const historyQuestionIds = Object.keys(this.historys);
     const total = historyQuestionIds.length;

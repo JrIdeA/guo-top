@@ -73,6 +73,7 @@ export const actionTypes = {
   stopGameCountdown: 'stopGameCountdown',
   tickGameCountdown: 'tickGameCountdown',
   startGame: 'startGame',
+  endGame: 'endGame',
   updateEndCountdown: 'updateEndCountdown',
   getQuestion: 'getQuestion',
   answerQuestion: 'answerQuestion',
@@ -99,7 +100,7 @@ export const reducers = {
     );
   },
   [WS_SERVER_WELCOME](state, payload) {
-    const { userId, gameStatus, count, leftTime, startTime, playtimeSeconds } = payload;
+    const { userId, gameStatus, count, leftTime, startTime, playtimeSeconds, leftPlaytimeSeconds } = payload;
     return {
       ...state,
       userId,
@@ -108,6 +109,7 @@ export const reducers = {
         count: count,
         startTime,
         playtimeSeconds,
+        leftPlaytimeSeconds,
       },
       control: {
         ...state.control,
@@ -230,6 +232,7 @@ export const sagas = [
             const nextEndCountdown = (yield select(state => state.game.control.endCountdown)) - tickerMs;
             yield put(createAction(actionTypes.tickGameCountdown)(nextEndCountdown))
             if (!(nextEndCountdown > 0)) {
+              yield put(createAction(actionTypes.endGame)());
               yield put(createAction(actionTypes.stopGameCountdown)());
             }
             yield call(delay, tickerMs);
@@ -242,7 +245,7 @@ export const sagas = [
   }(),
   takeLatest(actionTypes.startGame, function* startGame() {
     // TODO start time and left Time checked.
-    const updateEndCountdown = (yield select(state => state.game.game.playtimeSeconds)) * 1000;
+    const updateEndCountdown = (yield select(state => state.game.game.leftPlaytimeSeconds)) * 1000;
     yield put(createAction(actionTypes.updateEndCountdown)(updateEndCountdown));
     yield put(createAction(actionTypes.getQuestion)());
     yield put(createAction(actionTypes.startGameCountdown)());
