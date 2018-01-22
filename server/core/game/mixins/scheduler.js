@@ -21,44 +21,37 @@ const GameSchedulerProto = {
     const {
       startTime: startTimeStr,
       readySeconds,
-      prepareSeconds,
       playtimeSeconds,
       deadtimeSeconds,
     } = defaults(this.config, {
       startTime: '',
       readySeconds: 600,
-      prepareSeconds: 3,
       playtimeSeconds: 60,
       deadtimeSeconds: 90,
     });
 
     const startTime = parseStartTime(startTimeStr);
-    const prepareTime = startTime - (prepareSeconds * 1000);
-    const readyTime = prepareTime - (readySeconds * 1000);
+    const readyTime = startTime - (readySeconds * 1000);
     const endTime = startTime + (playtimeSeconds * 1000);
     const deadTime = startTime + (deadtimeSeconds * 1000);
     invariant(startTime, `game startTime invalid, parsed: ${startTime}`);
-    invariant(prepareTime > 0, `game prepareTime invalid, parsed: ${prepareTime}`);
     invariant(deadTime > startTime, `game deadTime should after then startTime, deadTime: ${deadTime}, startTime: ${startTime}`);
 
     this.playtimeSeconds = playtimeSeconds;
     this.readyTime = readyTime;
-    this.prepareTime = prepareTime;
     this.startTime = startTime;
     this.endTime = endTime;
     this.deadTime = deadTime;
     this.validStartime = startTime > 0;
 
     logger.debug('readyTime is ', readyTime);
-    logger.debug('prepareTime is ', readyTime);
     logger.debug('startTime is ', startTime);
     logger.debug('endTime is ', endTime);
     logger.debug('deadTime is ', deadTime);
   },
   _getNowStatus(time) {
     if (time < this.readyTime) return 'idle';
-    if (time < this.prepareTime) return 'ready';
-    if (time < this.startTime) return 'prepare';
+    if (time < this.startTime) return 'ready';
     if (time < this.deadTime) return 'start';
     return 'ending';
   },
@@ -79,9 +72,6 @@ const GameSchedulerProto = {
   },
   getStartTime() {
     return this.startTime;
-  },
-  getPrepareSeconds() {
-    return this.prepareSeconds;
   },
   getPlaytimeSeconds() {
     return this.playtimeSeconds;

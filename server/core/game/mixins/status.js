@@ -25,7 +25,6 @@ const GameStatusProto = {
     Object.defineProperties(status, {
       idle: createStatusProps('idle'),
       ready: createStatusProps('ready'),
-      prepare: createStatusProps('prepare'),
       start: createStatusProps('start'),
       ending: createStatusProps('ending'),
       result: createStatusProps('result'),
@@ -38,7 +37,6 @@ const GameStatusProto = {
     const onStatusChange = {
       idle: createStatusChangeHandle('idle'),
       ready: createStatusChangeHandle('ready'),
-      prepare: createStatusChangeHandle('prepare'),
       start: createStatusChangeHandle('start'),
       ending: createStatusChangeHandle('ending'),
       result: createStatusChangeHandle('result'),

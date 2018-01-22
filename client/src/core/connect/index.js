@@ -10,11 +10,16 @@ export default ({
   const mapStateToProps = (state, ownProps) => {
     let connectedProps = get(state, root);
     if (computed) {
-      connectedProps = cloneDeep(connectedProps);
-      Object.defineProperties(connectedProps, mapValues(computed, (compute) => {
-        return { get: () => compute(state) }
-      }));
+      connectedProps = {
+        ...connectedProps,
+        ...mapValues(computed, compute => compute(state)),
+      };
+      // connectedProps = cloneDeep(connectedProps);
+      // Object.defineProperties(connectedProps, mapValues(computed, (compute) => {
+      //   return { get: () => compute(state) }
+      // }));
     }
+    // console.log('connectedProps', connectedProps)
     return {
       ...ownProps,
       ...connectedProps,

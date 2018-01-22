@@ -42,7 +42,6 @@ wss.on('connection', (ws) => {
       status: game.getStatus(),
       time: {
         start: game.getStartTime(),
-        prepare: game.getPrepareSeconds(),
       },
     });
   }
@@ -57,7 +56,7 @@ wss.on('connection', (ws) => {
           response.error.gameInIdle();
         }],
         [
-          ['ready', 'prepare', 'start', 'ending'],
+          ['ready', 'start', 'ending'],
           () => {
             user = game.getUserByAuth(token);
             if (!user) {
@@ -92,7 +91,7 @@ wss.on('connection', (ws) => {
         ['ready', () => {
           response.error.gameNotStart();
         }],
-        [['prepare', 'start'], () => {
+        [['start'], () => {
           if (user.isTimeout()) {
             response.error.gameEndResulted();
             return;
@@ -126,7 +125,7 @@ wss.on('connection', (ws) => {
         ['result', () => {
           response.error.gameEndResulted();
         }],
-        [['prepare', 'start'], () => {
+        [['start'], () => {
           const answerResult = user.answerQuiz(
             questionId,
             answerCode,
@@ -150,13 +149,10 @@ wss.on('connection', (ws) => {
     //     ['result', () => {
     //       response.error.gameEndResulted();
     //     }],
-    //     [['prepare', 'start'], ( = {
+    //     [['start'], ( = {
     //       endTime: 0,
     //     }, type) => {
     //       user.qaManager.end();
-    //       if (type === 'prepare') {
-    //         // log exception
-    //       }
     //     }]
     //   ]);
     // },
