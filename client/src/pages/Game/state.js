@@ -159,6 +159,9 @@ export const reducers = {
       true
     );
   },
+  [actionTypes.startGame](state) {
+    return replaceChildNode(state, 'game.status', 'start');
+  },
   [actionTypes.updateEndCountdown](state, nextEndCountdown) {
     return replaceChildNode(state, 'control.endCountdown', nextEndCountdown);
   },
@@ -207,6 +210,7 @@ export const sagas = [
             const startTime = yield select(state => state.game.control.startTime);
             yield put(createAction(actionTypes.tickPrepareCountdown)())
             if (Date.now() > startTime) {
+              yield put(createAction(actionTypes.startGame)());
               yield put(createAction(actionTypes.stopPrepareCountdown)());
             }
             yield call(delay, 1000);
