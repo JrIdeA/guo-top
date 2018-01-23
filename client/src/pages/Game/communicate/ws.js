@@ -5,6 +5,9 @@ import {
   WS_CLIENT_GET_QUESTION,
   WS_CLIENT_SEND_ANSWER,
 } from '../../../shared/wstype';
+import {
+  ERROR_CONNECT_CLOSED,
+} from '../../../shared/error';
 import { wsStatusToActionType } from './actionType';
 
 function getActionByMessage({ type, data }) {
@@ -47,6 +50,10 @@ const gameWs = {
     });
     ws.addEventListener('error', (e) => {
       logger.error('ws: on error', e);
+    });
+    ws.addEventListener('close', (e) => {
+      logger.error('ws: on closed', e)
+      gameWs.dispatch(getActionByError({ error: ERROR_CONNECT_CLOSED }));
     });
     gameWs.ws = ws;
   },

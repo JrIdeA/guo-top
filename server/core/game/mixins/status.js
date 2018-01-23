@@ -52,6 +52,9 @@ const GameStatusProto = {
   setStatus(nextStatus) {
     this.status[nextStatus] = true;
   },
+  setStatusWithoutEmitEvent(nextStatus) {
+    this._status = nextStatus;
+  },
   condStatus(conds) {
     each(conds, ([
       targetStatus,

@@ -5,10 +5,12 @@ import { toast } from 'react-toastify';
 import { replaceChildNode } from '../../core';
 import {
   ws,
+  ERROR_CONNECT_CLOSED,
   ERROR_GAME_IN_IDLE,
   ERROR_BAD_REQUEST,
   ERROR_USER_NOT_REGISTER,
   ERROR_USRE_ALREADY_ANSWERED,
+  ERROR_GAME_NOT_START,
   WS_CLIENT_SEND_ANSWER,
   WS_SERVER_GAME_INFO,
   WS_SERVER_WELCOME,
@@ -52,6 +54,7 @@ export const initState = {
   modals: {
     gameInIdle: false,
     userNotRegister: false,
+    connectClosed: false,
   },
   ws,
 };
@@ -92,12 +95,34 @@ export const reducers = {
       Date.now(),
     );
   },
+  [ERROR_CONNECT_CLOSED](state, payload) {
+    return replaceChildNode(
+      state,
+      'modals.connectClosed',
+      true
+    );
+  },
   [ERROR_GAME_IN_IDLE](state, payload) {
     return replaceChildNode(
-      state, 
+      state,
       'modals.gameInIdle',
       true
     );
+  },
+  [ERROR_GAME_NOT_START](state, { leftTime, startTime, gameStatus, playtimeSeconds }) {
+    return {
+      ...state,
+      game: {
+        ...state.game,
+        status: gameStatus,
+        startTime,
+        playtimeSeconds,
+      },
+      control: {
+        ...state.control,
+        startTime: leftTime + Date.now(),
+      },
+    };
   },
   [WS_SERVER_WELCOME](state, payload) {
     const { userId, gameStatus, count, leftTime, startTime, playtimeSeconds, leftPlaytimeSeconds } = payload;
@@ -190,7 +215,7 @@ export const sagas = [
     yield put(createAction(actionTypes.startGameCountdown)());
   }),
   takeLatest(ERROR_BAD_REQUEST, function* () {
-    console.error('client send a bad request.');
+    toast('与服务器通信出现异常，如有问题请刷新');
   }),
   takeLatest(ERROR_USRE_ALREADY_ANSWERED, function* () {
     toast('该题已经答过啦~', {

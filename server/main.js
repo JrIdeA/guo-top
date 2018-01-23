@@ -70,12 +70,12 @@ wss.on('connection', (ws) => {
               extendData.startTime = game.getStartTime();
             } else if (status === 'start') {
               user.giveupCurrentQuizIfNotAnswer();
+              extendData.leftPlaytimeSeconds = user.getLeftPlaytimeSeconds();
             }
             return response.send.welcome(Object.assign(extendData, {
               userId: user.id,
               gameStatus: game.getStatus(),
               playtimeSeconds: game.getPlaytimeSeconds(),
-              leftPlaytimeSeconds: user.getLeftPlaytimeSeconds(),
               onlineUser: game.getOnlineUserCount(),
               count: user.getCount(),
             }));
@@ -92,7 +92,15 @@ wss.on('connection', (ws) => {
           response.error.gameInIdle();
         }],
         ['ready', () => {
-          response.error.gameNotStart();
+          const leftTime = game.getLeftStartTime();
+          const startTime = game.getStartTime();
+
+          response.error.gameNotStart({
+            leftTime,
+            startTime,
+            gameStatus: game.getStatus(),
+            playtimeSeconds: game.getPlaytimeSeconds(),
+          });
         }],
         [['start'], () => {
           if (user.isTimeout()) {

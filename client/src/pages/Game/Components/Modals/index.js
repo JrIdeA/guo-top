@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ModalGameInIdle from './GameInIdle';
 import ModalUserNotRegister from './UserNotRegister';
+import ModalConnectClosed from './ConnectClosed';
 import 'rodal/lib/rodal.css';
 
 export default class GameModals extends Component {
@@ -9,6 +10,7 @@ export default class GameModals extends Component {
       <div>
         <ModalGameInIdle {...this.props} />
         <ModalUserNotRegister {...this.props} />
+        <ModalConnectClosed {...this.props} />
       </div>
     );
   }

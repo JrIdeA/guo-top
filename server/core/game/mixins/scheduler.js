@@ -22,25 +22,24 @@ const GameSchedulerProto = {
       startTime: startTimeStr,
       readySeconds,
       playtimeSeconds,
-      deadtimeSeconds,
+      allowOvertimeSeconds,
     } = defaults(this.config, {
       startTime: '',
       readySeconds: 600,
       playtimeSeconds: 60,
-      deadtimeSeconds: 90,
+      allowOvertimeSeconds: 30,
     });
 
     const startTime = parseStartTime(startTimeStr);
     const readyTime = startTime - (readySeconds * 1000);
     const endTime = startTime + (playtimeSeconds * 1000);
-    const deadTime = startTime + (deadtimeSeconds * 1000);
+    const deadTime = startTime + (allowOvertimeSeconds * 1000);
     invariant(startTime, `game startTime invalid, parsed: ${startTime}`);
     invariant(deadTime > startTime, `game deadTime should after then startTime, deadTime: ${deadTime}, startTime: ${startTime}`);
 
     this.playtimeSeconds = playtimeSeconds;
     this.readyTime = readyTime;
     this.startTime = startTime;
-    this.endTime = endTime;
     this.deadTime = deadTime;
     this.validStartime = startTime > 0;
 
@@ -62,7 +61,8 @@ const GameSchedulerProto = {
     }
   },
   setNowStatus() {
-    this._status = this._getNowStatus(Date.now());
+    this.setStatusWithoutEmitEvent(this._getNowStatus(Date.now()));
+
     logger.debug('Now Time is', Date.now(), 'Game status is', this._status);
   },
   startScheduler() {

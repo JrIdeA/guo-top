@@ -46,6 +46,7 @@ module.exports = function createWsReponse(ws) {
       userNotRegister: sendError(ERROR_USER_NOT_REGISTER),
       userNotOnline: sendError(ERROR_USER_NOT_ONLINE),
       gameInIdle: sendError(ERROR_GAME_IN_IDLE),
+      gameNotStart: sendError(ERROR_GAME_NOT_START),
       gameEnding: sendError(ERROR_GAME_ENDING),
       gameEndResulted: sendError(ERROR_GAME_END_RESULTED),
       userGameTimeout: sendError(ERROR_USER_GAME_TIMEOUT),
