@@ -7,7 +7,8 @@ function createGameUser(game) {
   return class GameUser {
     constructor(userId) {
       this.id = userId;
-      this.clientEndedGame = false;
+      this.gameEnded = false;
+      this.rank = 0;
     }
     online() {
       game.onlineUser(this);
@@ -73,6 +74,8 @@ function createGameUser(game) {
         correct: stat.correct,
         wrong: stat.wrong,
         point: stat.point,
+        accuracy: stat.total ?
+          ((stat.correct / stat.total) * 100).toFixed(2) : 0,
       };
     }
     isTimeout() {
@@ -92,13 +95,30 @@ function createGameUser(game) {
       }
     }
     getLeftPlaytimeSeconds() {
-      if (this.clientEndedGame) return -1;
+      if (this.gameEnded) return -1;
       const playtimeSeconds = game.getPlaytimeSeconds();
       const usedSeconds = stat.getUsedSeconds();
       return playtimeSeconds - usedSeconds;
     }
-    endGameByClient() {
-      this.clientEndedGame = true;
+    endGame(clientTime) {
+      this.gameEnded = true;
+      this.giveupCurrentQuizIfNotAnswer();
+      stat.markEndTime(clientTime);
+      game.userEndGame();
+    }
+    isEnd() {
+      return this.gameEnded;
+    }
+    setRank(rank) {
+      this.rank = rank;
+    }
+    getResult() {
+      if (!game.status.result) {
+        return {};
+      }
+      return Object.assign({
+        rank: this.rank,
+      }, this.getCount());
     }
   };
 }

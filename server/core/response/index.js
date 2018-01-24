@@ -18,6 +18,7 @@ const {
   WS_SERVER_SEND_QUESTION,
   WS_SERVER_SEND_ANSWER_RESULT,
   WS_SERVER_SEND_ANSWERED_ALL,
+  WS_SERVER_SEND_GAME_RESULT,
 } = require('../../../shared/wstype');
 
 module.exports = function createWsReponse(ws) {
@@ -40,6 +41,7 @@ module.exports = function createWsReponse(ws) {
       answer: sendSuccess(WS_SERVER_SEND_ANSWER_RESULT),
       gameInfo: sendSuccess(WS_SERVER_GAME_INFO),
       answeredAll: sendSuccess(WS_SERVER_SEND_ANSWERED_ALL),
+      gameResult: sendSuccess(WS_SERVER_SEND_GAME_RESULT),
     },
     error: {
       badRequest: sendError(ERROR_BAD_REQUEST),

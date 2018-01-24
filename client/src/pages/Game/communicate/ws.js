@@ -4,6 +4,7 @@ import {
   WS_CLIENT_TICKET,
   WS_CLIENT_GET_QUESTION,
   WS_CLIENT_SEND_ANSWER,
+  WS_CLIENT_END,
 } from '../../../shared/wstype';
 import {
   ERROR_CONNECT_CLOSED,
@@ -77,6 +78,9 @@ const gameWs = {
   getQuestion() {
     this.send({
       type: WS_CLIENT_GET_QUESTION,
+      payload: {
+        time: Date.now(),
+      },
     });
   },
   sendAnswer(questionId, answerCode) {
@@ -87,8 +91,8 @@ const gameWs = {
         answerCode,
         time: Date.now(),
       },
-    })
-  }
+    });
+  },
 };
 
 export function initWs(dispatch) {

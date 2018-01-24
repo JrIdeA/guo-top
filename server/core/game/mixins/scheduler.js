@@ -49,6 +49,7 @@ const GameSchedulerProto = {
     logger.debug('deadTime is ', deadTime);
   },
   _getNowStatus(time) {
+    if (this._status === 'result') return 'result';
     if (time < this.readyTime) return 'idle';
     if (time < this.startTime) return 'ready';
     if (time < this.deadTime) return 'start';

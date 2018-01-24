@@ -17,6 +17,7 @@ import {
   WS_SERVER_SEND_QUESTION,
   WS_SERVER_SEND_ANSWER_RESULT,
   WS_SERVER_SEND_ANSWERED_ALL,
+  WS_SERVER_SEND_GAME_RESULT,
 } from './communicate';
 
 function createAction(type) {
@@ -191,6 +192,16 @@ export const reducers = {
       true
     );
   },
+  [WS_SERVER_SEND_GAME_RESULT](state, count) {
+    return {
+      ...state,
+      count,
+      game: {
+        ...state,
+        status: 'result',
+      },
+    };
+  },
   [actionTypes.startGame](state) {
     return replaceChildNode(state, 'game.status', 'start');
   },
@@ -297,6 +308,12 @@ export const sagas = [
     const answerOption = yield select(state => state.game.question.options[index]);
     if (!answerOption) return;
     yield put(actions.answerQuestion(answerOption.code));
+  }),
+  takeLatest(actionTypes.endGame, function* endGame() {
+    const {
+      id: questionId,
+    } = yield select(state => state.game.question);
+    ws.endGame(questionId);
   }),
 ];
 const flow = {

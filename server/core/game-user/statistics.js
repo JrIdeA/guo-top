@@ -8,6 +8,8 @@ class GameUserStatistic {
     this.point = 0;
     this.answerAll = false;
     this.answerLog = {};
+    this.endClientTime = null;
+    this.endServerTime = null;
   }
   markWrong(specialAnswer) {
     this.total += 1;
@@ -24,6 +26,10 @@ class GameUserStatistic {
   markAnsweredAll() {
     this.answerAll = true;
   }
+  markEndTime(clientTime) {
+    this.endClientTime = clientTime;
+    this.endServerTime = Date.now();
+  }
   addGetQuestionLog({ questionId, getQuestionClientTime }) {
     this.answerLog[questionId] = {
       getQuestionClientTime,
@@ -37,6 +43,7 @@ class GameUserStatistic {
     log.answerCode = answerCode;
     log.answerClientTime = answerClientTime;
     log.answerServerTime = Date.now();
+    log.usedClientTime = log.answerClientTime - log.getQuestionClientTime;
     log.usedServerTime = log.answerServerTime - log.getQuestionServerTime;
   }
   getUsedSeconds() {
@@ -45,7 +52,6 @@ class GameUserStatistic {
       if (Number.isNaN(usedServerTime)) {
         return p;
       }
-      console.log('usedServerTime', usedServerTime);
       return p + (usedServerTime / 1000);
     }, 0);
   }

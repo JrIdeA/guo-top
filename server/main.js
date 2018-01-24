@@ -8,10 +8,14 @@ const {
   WS_CLIENT_TICKET,
   WS_CLIENT_GET_QUESTION,
   WS_CLIENT_SEND_ANSWER,
-  // WS_CLIENT_END,
+  WS_CLIENT_END,
 } = require('../shared/wstype');
 const createWsReponse = require('./core/response');
 const Game = require('./core/game');
+
+process.on('uncaughtException', (e) => {
+  logger.error('process uncaughtException', e);
+});
 
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -86,7 +90,9 @@ wss.on('connection', (ws) => {
         }],
       ]);
     },
-    [WS_CLIENT_GET_QUESTION]() {
+    [WS_CLIENT_GET_QUESTION]({
+      time: clientTime,
+    }) {
       game.condStatus([
         ['idle', () => {
           response.error.gameInIdle();
@@ -110,6 +116,7 @@ wss.on('connection', (ws) => {
           const nextQuiz = user.getNextQuiz();
           if (!nextQuiz) {
             response.send.answeredAll();
+            user.endGame(clientTime);
             return;
           }
           response.send.question(nextQuiz);
@@ -155,19 +162,28 @@ wss.on('connection', (ws) => {
         }],
       ]);
     },
-    // [WS_CLIENT_END](payload) {
-    //   game.condStatus([
-    //     ['result', () => {
-    //       response.error.gameEndResulted();
-    //     }],
-    //     [['start'], ( = {
-    //       endTime: 0,
-    //     }, type) => {
-    //       user.qaManager.end();
-    //     }]
-    //   ]);
-    // },
+    [WS_CLIENT_END]({
+      time,
+    }) {
+      game.condStatus([
+        ['idle', () => {
+          response.error.gameInIdle();
+        }],
+        ['result', () => {
+          response.error.gameEndResulted();
+        }],
+        [['start'], () => {
+          user.endGame(time);
+        }],
+      ]);
+    },
   };
+
+  game.onStatusChange.result(() => {
+    const userResult = user.getResult();
+    response.send.gameResult(userResult);
+  });
+
   ws.on('message', (msgStr) => {
     logger.debug('get message', msgStr);
 
