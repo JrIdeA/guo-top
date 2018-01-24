@@ -1,4 +1,4 @@
-const { values, each, sortBy, map, every } = require('lodash');
+const { values, each, sortBy, map, every, reverse } = require('lodash');
 const CreateGameUser = require('../../game-user');
 const { logger } = require('../../utils');
 
@@ -22,14 +22,14 @@ const GameUsersProto = {
     return new this.GameUser(userId);
   },
   _calculateResultRank() {
-    const rankedList = sortBy(
+    const rankedList = reverse(sortBy(
       map(this._loginedUsers, (user) => {
         const count = user.getCount();
         count.userId = user.id;
         return count;
       }),
       ['point', 'accuracy', 'total']
-    );
+    ));
     const resultRankList = [];
     let rank = 0;
     let prev;
