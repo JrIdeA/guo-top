@@ -1,14 +1,13 @@
 const GameUserStatistic = require('./statistics');
 
 function createGameUser(game) {
-  const questions = game.getRandomQuestionsQueue();
-  const stat = new GameUserStatistic();
-
   return class GameUser {
     constructor(userId) {
       this.id = userId;
       this.gameEnded = false;
       this.rank = 0;
+      this.questionQueue = game.getRandomQuestionsQueue();
+      this.stat = new GameUserStatistic();
     }
     online() {
       game.onlineUser(this);
@@ -17,29 +16,29 @@ function createGameUser(game) {
       game.offlineUser(this);
     }
     getNextQuiz(getQuestionClientTime) {
-      const currentQuestion = questions.current;
+      const currentQuestion = this.questionQueue.current;
       if (currentQuestion && !currentQuestion.isAnswered()) {
         currentQuestion.giveup();
-        stat.markWrong();
-        stat.addAnswerLog({
+        this.stat.markWrong();
+        this.stat.addAnswerLog({
           questionId: currentQuestion.id,
           giveup: true,
         });
       }
 
-      const nextQuestion = questions.next();
+      const nextQuestion = this.questionQueue.next();
       if (!nextQuestion) {
-        stat.markAnsweredAll();
+        this.stat.markAnsweredAll();
         return null;
       }
-      stat.addGetQuestionLog({
+      this.stat.addGetQuestionLog({
         questionId: nextQuestion.id,
         getQuestionClientTime,
       });
       return nextQuestion.getQuiz();
     }
     answerQuiz(questionId, answerCode, answerClientTime) {
-      const target = questions.get(questionId);
+      const target = this.questionQueue.get(questionId);
       if (!target) {
         return {
           questionId,
@@ -58,8 +57,8 @@ function createGameUser(game) {
         };
       }
       const correct = target.answer(answerCode);
-      correct ? stat.markCorrect(target.isSpecial()) : stat.markWrong(target.isSpecial());
-      stat.addAnswerLog({
+      correct ? this.stat.markCorrect(target.isSpecial()) : this.stat.markWrong(target.isSpecial());
+      this.stat.addAnswerLog({
         questionId, answerCode, answerClientTime,
       });
       return {
@@ -70,12 +69,12 @@ function createGameUser(game) {
     }
     getCount() {
       return {
-        total: stat.total,
-        correct: stat.correct,
-        wrong: stat.wrong,
-        point: stat.point,
-        accuracy: stat.total ?
-          ((stat.correct / stat.total) * 100).toFixed(2) : 0,
+        total: this.stat.total,
+        correct: this.stat.correct,
+        wrong: this.stat.wrong,
+        point: this.stat.point,
+        accuracy: this.stat.total ?
+          ((this.stat.correct / this.stat.total) * 100).toFixed(2) : 0,
       };
     }
     isTimeout() {
@@ -84,11 +83,11 @@ function createGameUser(game) {
       return false;
     }
     giveupCurrentQuizIfNotAnswer() {
-      const current = questions.getCurrent();
+      const current = this.questionQueue.getCurrent();
       if (current && current.id && !current.isAnswered()) {
         current.giveup();
-        stat.markWrong();
-        stat.addAnswerLog({
+        this.stat.markWrong();
+        this.stat.addAnswerLog({
           questionId: current.id,
           giveup: true,
         });
@@ -97,13 +96,13 @@ function createGameUser(game) {
     getLeftPlaytimeSeconds() {
       if (this.gameEnded) return -1;
       const playtimeSeconds = game.getPlaytimeSeconds();
-      const usedSeconds = stat.getUsedSeconds();
+      const usedSeconds = this.stat.getUsedSeconds();
       return playtimeSeconds - usedSeconds;
     }
     endGame(clientTime) {
       this.gameEnded = true;
       this.giveupCurrentQuizIfNotAnswer();
-      stat.markEndTime(clientTime);
+      this.stat.markEndTime(clientTime);
       game.userEndGame();
     }
     isEnd() {

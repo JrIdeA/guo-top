@@ -69,7 +69,7 @@ const gameWs = {
   },
   sendTicket() {
     // const token = Cookies.get('token');
-    const token = 'abcdefg';
+    const token = window.location.pathname.replace(/^\//, '');
     this.send({ 
       type: WS_CLIENT_TICKET, 
       payload: { token } 

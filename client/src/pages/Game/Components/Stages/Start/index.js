@@ -15,24 +15,24 @@ export default class StagesStart extends Component {
       now: Date.now(),
     });
     this.timer = setInterval(() => {
-      if (!this.props.control.questionGetting) {
-        this.setState({
-          now: Date.now(),
-        });
-      }
+      this.setState({
+        now: Date.now(),
+      });
     }, 300);
   }
-  componentWillMount() {
+  componentDidMount() {
     window.addEventListener('beforeunload', this.handleBeforeUnload);
     this.startCountdown();
   }
   componentWillUnmount() {
-    window.removeEventListener('beforeunload', this.handleBeforeUnload);
     clearInterval(this.timer);
+    window.removeEventListener('beforeunload', this.handleBeforeUnload);
   }
   componentWillReceiveProps(nextProps) {
     if (nextProps.modals.connectClosed) {
       window.removeEventListener('beforeunload', this.handleBeforeUnload);
+      clearInterval(this.timer);
+      return;
     }
 
     if (nextProps.control.questionGetting && !this.props.control.questionGetting) {
@@ -64,6 +64,7 @@ export default class StagesStart extends Component {
         <QA 
           {...this.props.question}
           answerQuestion={this.props.answerQuestion}
+          control={this.props.control}
         />
       </div>
     );
