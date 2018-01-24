@@ -10,7 +10,7 @@ export default class QA extends Component {
       answer: PropTypes.string,
       code: PropTypes.string,
     })),
-    
+    correct: PropTypes.bool,
   };
   getHandleAnswerQuestion = (code) => () => {
     this.props.answerQuestion(code);
@@ -23,7 +23,16 @@ export default class QA extends Component {
         {options.map(({ answer, code }) => {
           return (
             <li key={code}>
-              <a onClick={this.getHandleAnswerQuestion(code)}>{answer}</a>
+              <a
+                style={{
+                  color: (
+                    this.props.correct == null || this.props.answerCode !== code
+                  ) ? undefined : (this.props.correct) ? 'green' : 'red',
+                }}
+                onClick={this.getHandleAnswerQuestion(code)}
+              >
+                {answer}
+              </a>
             </li>
           );
         })}

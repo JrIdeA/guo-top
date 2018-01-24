@@ -50,6 +50,7 @@ export const initState = {
     startTime: 0,
     endCountdown: 0,
     answeredAll: false,
+    questionGetting: true,
   },
   modals: {
     gameInIdle: false,
@@ -160,6 +161,10 @@ export const reducers = {
         answerCode: null,
         correct: null,
       },
+      control: {
+        ...state.control,
+        questionGetting: false,
+      }
     };
   },
   [WS_SERVER_SEND_ANSWER_RESULT](state, {
@@ -196,7 +201,8 @@ export const reducers = {
     return replaceChildNode(state, 'control.endCountdown', nextEndCountdown);
   },
   [actionTypes.answerQuestion](state, answerCode) {
-    return replaceChildNode(state, 'question.answerCode', answerCode);
+    state = replaceChildNode(state, 'question.answerCode', answerCode);
+    return replaceChildNode(state, 'control.questionGetting', true);
   },
 };
 export const sagas = [
@@ -224,6 +230,7 @@ export const sagas = [
     });
   }),
   takeLatest(WS_SERVER_SEND_ANSWER_RESULT, function* () {
+    yield call(delay, 500);
     yield put(createAction(actionTypes.getQuestion)());
   }),
   takeLatest(WS_SERVER_SEND_ANSWERED_ALL, function* () {
@@ -283,6 +290,7 @@ export const sagas = [
       id: questionId,
       answerCode,
     } = yield select(state => state.game.question);
+    yield put(createAction(actionTypes.stopGameCountdown)());
     ws.sendAnswer(questionId, answerCode);
   }),
   takeLatest(actionTypes.answerQuestionByIndex, function* answerQuestionByIndex({ payload: index }) {
