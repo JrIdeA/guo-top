@@ -49,7 +49,8 @@ export const initState = {
   control: {
     now: Date.now(),
     startTime: 0,
-    endCountdown: 0,
+    endTime: 0,
+    pauseTime: 0,
     answeredAll: false,
     questionGetting: true,
   },
@@ -76,10 +77,8 @@ export const actionTypes = {
   tickPrepareCountdown: 'tickPrepareCountdown',
   startGameCountdown: 'startGameCountdown',
   stopGameCountdown: 'stopGameCountdown',
-  tickGameCountdown: 'tickGameCountdown',
   startGame: 'startGame',
   endGame: 'endGame',
-  updateEndCountdown: 'updateEndCountdown',
   getQuestion: 'getQuestion',
   answerQuestion: 'answerQuestion',
   answerQuestionByIndex: 'answerQuestionByIndex',
@@ -153,6 +152,8 @@ export const reducers = {
     );
   },
   [WS_SERVER_SEND_QUESTION](state, { id, question, options }) {
+    const nextEndTime = state.control.endTime + (Date.now() - state.control.pauseTime);
+
     return {
       ...state,
       question: {
@@ -164,6 +165,7 @@ export const reducers = {
       },
       control: {
         ...state.control,
+        endTime: nextEndTime,
         questionGetting: false,
       }
     };
@@ -203,17 +205,35 @@ export const reducers = {
     };
   },
   [actionTypes.startGame](state) {
-    return replaceChildNode(state, 'game.status', 'start');
-  },
-  [actionTypes.updateEndCountdown](state, nextEndCountdown) {
-    return replaceChildNode(state, 'control.endCountdown', nextEndCountdown);
-  },
-  [actionTypes.tickGameCountdown](state, nextEndCountdown) {
-    return replaceChildNode(state, 'control.endCountdown', nextEndCountdown);
+    const now = Date.now();
+    const endTime = now + state.game.leftPlaytimeSeconds * 1000;
+
+    return {
+      ...state,
+      game: {
+        ...state.game,
+        status: 'start',
+      },
+      control: {
+        ...state.control,
+        pauseTime: now,
+        endTime,
+      },
+    }
   },
   [actionTypes.answerQuestion](state, answerCode) {
-    state = replaceChildNode(state, 'question.answerCode', answerCode);
-    return replaceChildNode(state, 'control.questionGetting', true);
+    return {
+      ...state,
+      question: {
+        ...state.question,
+        answerCode,
+      },
+      control: {
+        ...state.control,
+        questionGetting: true,
+        pauseTime: Date.now(),
+      }
+    };
   },
 };
 export const sagas = [
@@ -241,7 +261,7 @@ export const sagas = [
     });
   }),
   takeLatest(WS_SERVER_SEND_ANSWER_RESULT, function* () {
-    yield call(delay, 500);
+    yield call(delay, 300);
     yield put(createAction(actionTypes.getQuestion)());
   }),
   takeLatest(WS_SERVER_SEND_ANSWERED_ALL, function* () {
@@ -272,9 +292,8 @@ export const sagas = [
       const timeTickTask = yield fork(function* timeTick() {
         try {
           while (true) {
-            const nextEndCountdown = (yield select(state => state.game.control.endCountdown)) - tickerMs;
-            yield put(createAction(actionTypes.tickGameCountdown)(nextEndCountdown))
-            if (!(nextEndCountdown > 0)) {
+            const endTime = yield select(state => state.game.control.endTime);
+            if (endTime && Date.now() > endTime) {
               yield put(createAction(actionTypes.endGame)());
               yield put(createAction(actionTypes.stopGameCountdown)());
             }
@@ -287,9 +306,6 @@ export const sagas = [
     }
   }(),
   takeLatest(actionTypes.startGame, function* startGame() {
-    // TODO start time and left Time checked.
-    const updateEndCountdown = (yield select(state => state.game.game.leftPlaytimeSeconds)) * 1000;
-    yield put(createAction(actionTypes.updateEndCountdown)(updateEndCountdown));
     yield put(createAction(actionTypes.getQuestion)());
     yield put(createAction(actionTypes.startGameCountdown)());
   }),
