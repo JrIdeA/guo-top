@@ -13,6 +13,7 @@ export default class QA extends Component {
     correct: PropTypes.bool,
   };
   getHandleAnswerQuestion = (code) => () => {
+    if (this.props.control.questionGetting) return;
     this.props.answerQuestion(code);
   };
   renderOptions() {

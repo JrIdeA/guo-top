@@ -12,7 +12,11 @@ export default class Game extends Component {
   }
   initKeyboardQuickAnswer = () => {
     document.addEventListener('keydown', (e) => {
-      if (this.props.game.status === 'start' && !this.props.control.answeredAll) {
+      if (
+        this.props.game.status === 'start' && 
+        !this.props.control.answeredAll &&
+        !this.props.control.questionGetting
+      ) {
         const index = +keycode(e) - 1;
         if (Number.isNaN(index)) {
           return;

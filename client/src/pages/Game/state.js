@@ -1,5 +1,5 @@
 import { delay } from 'redux-saga';
-import { takeLatest, select, takeEvery, put, take, fork, call, cancel } from 'redux-saga/effects';
+import { takeLatest, select, put, take, fork, call, cancel } from 'redux-saga/effects';
 import moment from 'moment';
 import { toast } from 'react-toastify';
 import { replaceChildNode } from '../../core';
