@@ -315,6 +315,9 @@ export const sagas = [
     } = yield select(state => state.game.question);
     ws.endGame(questionId);
   }),
+  takeLatest(WS_SERVER_SEND_GAME_RESULT, function* () {
+    yield put(createAction(actionTypes.stopGameCountdown)());
+  }),
 ];
 const flow = {
 

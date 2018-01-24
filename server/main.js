@@ -60,7 +60,7 @@ wss.on('connection', (ws) => {
           response.error.gameInIdle();
         }],
         [
-          ['ready', 'start', 'ending'],
+          ['ready', 'start', 'ending', 'result'],
           () => {
             user = game.getUserByAuth(token);
             if (!user) {
@@ -81,13 +81,10 @@ wss.on('connection', (ws) => {
               gameStatus: game.getStatus(),
               playtimeSeconds: game.getPlaytimeSeconds(),
               onlineUser: game.getOnlineUserCount(),
-              count: user.getCount(),
+              count: user.getResult(),
             }));
           },
         ],
-        ['result', () => {
-          response.error.gameEndResulted();
-        }],
       ]);
     },
     [WS_CLIENT_GET_QUESTION]({
@@ -125,7 +122,7 @@ wss.on('connection', (ws) => {
           response.error.gameEnding();
         }],
         ['result', () => {
-          response.error.gameEndResulted();
+          response.send.gameResult(user.getResult());
         }],
       ]);
     },
@@ -141,7 +138,7 @@ wss.on('connection', (ws) => {
           response.error.gameEnding();
         }],
         ['result', () => {
-          response.error.gameEndResulted();
+          response.send.gameResult(user.getResult());
         }],
         [['start'], () => {
           const answerResult = user.answerQuiz(
@@ -170,7 +167,7 @@ wss.on('connection', (ws) => {
           response.error.gameInIdle();
         }],
         ['result', () => {
-          response.error.gameEndResulted();
+          response.send.gameResult(user.getResult());
         }],
         [['start'], () => {
           user.endGame(time);
@@ -180,8 +177,7 @@ wss.on('connection', (ws) => {
   };
 
   game.onStatusChange.result(() => {
-    const userResult = user.getResult();
-    response.send.gameResult(userResult);
+    response.send.gameResult(user.getResult());
   });
 
   ws.on('message', (msgStr) => {

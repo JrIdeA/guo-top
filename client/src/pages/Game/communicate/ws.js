@@ -93,6 +93,14 @@ const gameWs = {
       },
     });
   },
+  endGame() {
+    this.send({
+      type: WS_CLIENT_END,
+      payload: {
+        time: Date.now(),
+      },
+    });
+  }
 };
 
 export function initWs(dispatch) {

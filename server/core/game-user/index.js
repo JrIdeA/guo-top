@@ -114,7 +114,7 @@ function createGameUser(game) {
     }
     getResult() {
       if (!game.status.result) {
-        return {};
+        return this.getCount();
       }
       return Object.assign({
         rank: this.rank,
