@@ -92,7 +92,7 @@ function createGameUser(game) {
       }
     }
     getLeftPlaytimeSeconds() {
-      if (this.endGameByClient) return -1;
+      if (this.clientEndedGame) return -1;
       const playtimeSeconds = game.getPlaytimeSeconds();
       const usedSeconds = stat.getUsedSeconds();
       return playtimeSeconds - usedSeconds;

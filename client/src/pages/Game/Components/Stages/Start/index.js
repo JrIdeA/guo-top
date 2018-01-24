@@ -13,6 +13,11 @@ export default class StagesStart extends Component {
   componentWillUnmount() {
     window.removeEventListener('beforeunload', this.handleBeforeUnload);
   }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.modals.connectClosed) {
+      window.removeEventListener('beforeunload', this.handleBeforeUnload);
+    }
+  }
   renderGameCountdown() {
     const { control: { endCountdown } } = this.props;
     return (

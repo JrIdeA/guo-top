@@ -33,7 +33,7 @@ const GameSchedulerProto = {
     const startTime = parseStartTime(startTimeStr);
     const readyTime = startTime - (readySeconds * 1000);
     const endTime = startTime + (playtimeSeconds * 1000);
-    const deadTime = startTime + (allowOvertimeSeconds * 1000);
+    const deadTime = endTime + (allowOvertimeSeconds * 1000);
     invariant(startTime, `game startTime invalid, parsed: ${startTime}`);
     invariant(deadTime > startTime, `game deadTime should after then startTime, deadTime: ${deadTime}, startTime: ${startTime}`);
 
@@ -78,6 +78,9 @@ const GameSchedulerProto = {
   },
   getLeftStartTime() {
     return this.startTime - Date.now();
+  },
+  getLeftEndTime() {
+    return Date.now() - this.endTime;
   },
 };
 
