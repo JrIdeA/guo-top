@@ -205,8 +205,14 @@ export const reducers = {
     };
   },
   [actionTypes.startGame](state) {
+    let leftSeconds;
+    if (state.game.status === 'start') {
+      leftSeconds = state.game.leftPlaytimeSeconds;
+    } else {
+      leftSeconds = state.game.playtimeSeconds;
+    }
     const now = Date.now();
-    const endTime = now + state.game.leftPlaytimeSeconds * 1000;
+    const endTime = now + leftSeconds * 1000;
 
     return {
       ...state,
