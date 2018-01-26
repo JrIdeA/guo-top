@@ -11,6 +11,7 @@ export default class GameStageReady extends Component {
           <p>你需要在 {this.props.game.playtimeSeconds}s 内进行答题，题目均为单选题。</p>
           <p>答题正确得一分，答题错误扣一分，每题必答不能跳过。</p>
           <p>答题结束后将统计所有人的得分，得分前 16 名将进入决赛进行两两 PK 角逐榛果知识王者的称号。</p>
+          <p>最终成绩计算以服务器为准。</p>
         </div>
         <div>
           <h3>友情提示：</h3>

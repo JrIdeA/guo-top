@@ -1,8 +1,9 @@
+import { mapValues } from 'lodash';
 import { delay } from 'redux-saga';
 import { takeLatest, select, put, take, fork, call, cancel } from 'redux-saga/effects';
 import moment from 'moment';
 import { toast } from 'react-toastify';
-import { replaceChildNode } from '../../core';
+import { replaceChildNode, createActionCreator } from '../../core';
 import {
   ws,
   ERROR_CONNECT_CLOSED,
@@ -20,11 +21,6 @@ import {
   WS_SERVER_SEND_GAME_RESULT,
 } from './communicate';
 
-function createAction(type) {
-  return (payload) => ({ type, payload });
-}
-
-export const root = 'game';
 export const initState = {
   userId: '',
   game: {
@@ -63,11 +59,11 @@ export const initState = {
 };
 export const computed = {
   startTimeFormatted(state) {
-    return moment(state.game.game.startTime).format('YYYY-MM-DD HH:mm:ss');
+    return moment(state.game.startTime).format('YYYY-MM-DD HH:mm:ss');
   },
   leftStartSeconds(state) {
-    if (!state.game.control.startTime) return 0;
-    return Math.floor((state.game.control.startTime - state.game.control.now) / 1000);
+    if (!state.control.startTime) return 0;
+    return Math.floor((state.control.startTime - state.control.now) / 1000);
   }
 };
 export const actionTypes = {
@@ -83,11 +79,7 @@ export const actionTypes = {
   answerQuestion: 'answerQuestion',
   answerQuestionByIndex: 'answerQuestionByIndex',
 }
-export const actions = {
-  completeContraCheats: createAction(actionTypes.completeContraCheats),
-  answerQuestion: createAction(actionTypes.answerQuestion),
-  answerQuestionByIndex: createAction(actionTypes.answerQuestionByIndex),
-};
+export const actions = mapValues(actionTypes, createActionCreator);
 export const reducers = {
   [actionTypes.tickPrepareCountdown](state) {
     return replaceChildNode(
@@ -244,18 +236,18 @@ export const reducers = {
 };
 export const sagas = [
   takeLatest(WS_SERVER_GAME_INFO, function* ({ userId, gameStatus }) {
-    const ws = yield select(state => state.game.ws);
+    const ws = yield select(state => state.ws);
     ws.sendTicket();
   }),
   takeLatest(WS_SERVER_WELCOME, function* ({ payload: { gameStatus, leftTime } }) {
     if (gameStatus === 'ready' && leftTime) {
-      yield put(createAction(actionTypes.startPrepareCountdown)());
+      yield put(actions.startPrepareCountdown());
     } else if (gameStatus === 'start') {
-      yield put(createAction(actionTypes.startGame)());
+      yield put(actions.startGame());
     }
   }),
   takeLatest(WS_SERVER_SEND_QUESTION, function* ({ payload: { id, options, question } }) {
-    yield put(createAction(actionTypes.startGameCountdown)());
+    yield put(actions.startGameCountdown());
   }),
   takeLatest(ERROR_BAD_REQUEST, function* () {
     toast('与服务器通信出现异常，如有问题请刷新');
@@ -268,21 +260,21 @@ export const sagas = [
   }),
   takeLatest(WS_SERVER_SEND_ANSWER_RESULT, function* () {
     yield call(delay, 300);
-    yield put(createAction(actionTypes.getQuestion)());
+    yield put(actions.getQuestion());
   }),
   takeLatest(WS_SERVER_SEND_ANSWERED_ALL, function* () {
-    yield put(createAction(actionTypes.stopGameCountdown)());
+    yield put(actions.stopGameCountdown());
   }),
   function* watchPrepareCountdown() {
     while (yield take(actionTypes.startPrepareCountdown)) {
       const timeTickTask = yield fork(function* timeTick() {
         try {
           while (true) {
-            const startTime = yield select(state => state.game.control.startTime);
-            yield put(createAction(actionTypes.tickPrepareCountdown)())
+            const startTime = yield select(state => state.control.startTime);
+            yield put(actions.tickPrepareCountdown());
             if (Date.now() > startTime) {
-              yield put(createAction(actionTypes.startGame)());
-              yield put(createAction(actionTypes.stopPrepareCountdown)());
+              yield put(actions.startGame());
+              yield put(actions.stopPrepareCountdown());
             }
             yield call(delay, 1000);
           }
@@ -298,10 +290,10 @@ export const sagas = [
       const timeTickTask = yield fork(function* timeTick() {
         try {
           while (true) {
-            const endTime = yield select(state => state.game.control.endTime);
+            const endTime = yield select(state => state.control.endTime);
             if (endTime && Date.now() > endTime) {
-              yield put(createAction(actionTypes.endGame)());
-              yield put(createAction(actionTypes.stopGameCountdown)());
+              yield put(actions.endGame());
+              yield put(actions.stopGameCountdown());
             }
             yield call(delay, tickerMs);
           }
@@ -312,8 +304,8 @@ export const sagas = [
     }
   }(),
   takeLatest(actionTypes.startGame, function* startGame() {
-    yield put(createAction(actionTypes.getQuestion)());
-    yield put(createAction(actionTypes.startGameCountdown)());
+    yield put(actions.getQuestion());
+    yield put(actions.startGameCountdown());
   }),
   takeLatest(actionTypes.getQuestion, function* getQuestion() {
     ws.getQuestion();
@@ -322,25 +314,22 @@ export const sagas = [
     const {
       id: questionId,
       answerCode,
-    } = yield select(state => state.game.question);
-    yield put(createAction(actionTypes.stopGameCountdown)());
+    } = yield select(state => state.question);
+    yield put(actions.stopGameCountdown());
     ws.sendAnswer(questionId, answerCode);
   }),
   takeLatest(actionTypes.answerQuestionByIndex, function* answerQuestionByIndex({ payload: index }) {
-    const answerOption = yield select(state => state.game.question.options[index]);
+    const answerOption = yield select(state => state.question.options[index]);
     if (!answerOption) return;
     yield put(actions.answerQuestion(answerOption.code));
   }),
   takeLatest(actionTypes.endGame, function* endGame() {
     const {
       id: questionId,
-    } = yield select(state => state.game.question);
+    } = yield select(state => state.question);
     ws.endGame(questionId);
   }),
   takeLatest(WS_SERVER_SEND_GAME_RESULT, function* () {
-    yield put(createAction(actionTypes.stopGameCountdown)());
+    yield put(actions.stopGameCountdown());
   }),
 ];
-const flow = {
-
-};

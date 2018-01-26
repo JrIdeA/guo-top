@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
 import { reducers as reducersGame, initState as initStateGame } from '../pages/Game';
-import { reducers as reducersHome, initState as initStateHome } from '../pages/Home';
+// import { reducers as reducersHome, initState as initStateHome } from '../pages/Home';
 
 function createReducerByFrames(reducerFrames, initState) {
   return (state = initState, action) => {
@@ -14,4 +14,4 @@ function createReducerByFrames(reducerFrames, initState) {
   };
 }
 
-export default createReducerByFrames(reducersHome, initStateHome);
+export default createReducerByFrames(reducersGame, initStateGame);
