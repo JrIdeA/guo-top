@@ -17,10 +17,28 @@ process.on('uncaughtException', (e) => {
   logger.error('process uncaughtException', e);
 });
 
-const server = http.createServer((req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.end();
+const express = require('express');
+const app = express();
+
+const questionsData = JSON.parse(fs.readFileSync(path.join(
+  __dirname, '../data/questions/index.json'
+)));
+const game = new Game(config.game, questionsData);
+game.registerUser('yejiren', 'yejiren'); // test
+game.registerUser('wangmeiling', 'wangmeiling');
+
+app.get('/', express.static(path.join(__dirname, '../client/public')));
+app.get('/api/game', (req, res) => {
+  const status = game.getStatus();
+  res.send({
+    status,
+    readyTime: game.getReadyTime(),
+    startTime: game.getStartTime(),
+    stadiumLink: game.isStatusAfter('ready') ? '/game' : undefined,
+  });
 });
+
+const server = http.createServer(app);
 
 const wss = new WebSocket.Server({
   server,
@@ -29,13 +47,6 @@ const wss = new WebSocket.Server({
     return true;
   },
 });
-
-// start scheduler
-const questionsData = JSON.parse(fs.readFileSync(path.join(
-  __dirname, '../data/questions/index.json'
-)));
-const game = new Game(config.game, questionsData);
-game.registerUser('yejiren', 'abcdefg');
 
 wss.on('connection', (ws) => {
   const response = createWsReponse(ws);
@@ -177,7 +188,9 @@ wss.on('connection', (ws) => {
   };
 
   game.onStatusChange.result(() => {
-    response.send.gameResult(user.getResult());
+    if (user) {
+      response.send.gameResult(user.getResult());
+    }
   });
 
   ws.on('message', (msgStr) => {

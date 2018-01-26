@@ -2,13 +2,12 @@ import { connect } from 'react-redux';
 import { mapValues, cloneDeep, get } from 'lodash';
 
 export default ({
-  root,
   initState,
   computed,
   actions,
 }) => {
   const mapStateToProps = (state, ownProps) => {
-    let connectedProps = get(state, root);
+    let connectedProps = state;
     if (computed) {
       connectedProps = {
         ...connectedProps,

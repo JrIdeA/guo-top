@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { Router } from 'react-router';
-import Game from './pages/Game';
+// import Game from './pages/Game';
+import Game from './pages/Home';
 import store from './entry/store';
 
 ReactDOM.render(

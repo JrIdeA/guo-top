@@ -71,6 +71,9 @@ const GameSchedulerProto = {
       this._timeTick(Date.now());
     }, 500);
   },
+  getReadyTime() {
+    return this.readyTime;
+  },
   getStartTime() {
     return this.startTime;
   },

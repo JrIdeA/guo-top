@@ -1,7 +1,7 @@
-import { sagas as sagasGame } from '../pages/Game';
+import { sagas as sagasHome } from '../pages/Home';
 
 export default function* rootSaga()  {
   yield [
-    ...sagasGame,
+    ...sagasHome,
   ];
 }

@@ -1,6 +1,8 @@
 const { isArray, each, isFunction } = require('lodash');
 const { logger } = require('../../utils');
 
+const statusOrder = ['idle', 'ready', 'start', 'ending', 'result'];
+
 const GameStatusProto = {
   initStatus() {
     this._status = 'idle';
@@ -70,6 +72,12 @@ const GameStatusProto = {
         }
       }
     });
+  },
+  isStatusAfter(compared) {
+    if (!compared) return false;
+    const comparedIndex = statusOrder.indexOf(compared);
+    const currentIndex = statusOrder.indexOf(this._status);
+    return comparedIndex >= 0 && (currentIndex >= comparedIndex);
   },
 };
 
