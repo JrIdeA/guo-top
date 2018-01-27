@@ -3,6 +3,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import keycode from 'keycode';
 import Stage from './Stages';
 import Modals from './Modals';
+import './index.css';
 
 export default class Game extends Component {
   componentWillMount() {
@@ -55,7 +56,7 @@ export default class Game extends Component {
   }
   render() {
     return (
-      <div>
+      <div className="game">
         <Stage {...this.props} />
         <Modals {...this.props} />
         <ToastContainer />

@@ -1,0 +1,40 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  background: rgb(235, 104, 74);
+}
+.answer-options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.answer-options li {
+  padding: 0 50px;
+  margin-bottom: 20px;
+}
+.answer-options button {
+  border: solid 2px #fff;
+  color: #fff;
+  background: transparent;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 20px;
+  border-radius: 40px;
+  padding: 10px 0;
+}
+.answer-options button svg {
+  margin-bottom: -3px;
+  margin-right: 5px;
+  color: greenyellow;
+}
+.answer-options button.selected {
+  background: #fff;
+  color: rgb(235, 104, 74);
+}
+.answer-options button.correct {
+
+}
+.answer-options button.wrong {
+
+}
