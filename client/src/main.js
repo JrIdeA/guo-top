@@ -1,13 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import Game from './pages/Game';
-// import Home from './pages/Home';
 import store from './entry/store';
+// import Game from './pages/Game';
+// import Home from './pages/Home';
+import Rank from './pages/Rank';
 
 ReactDOM.render(
   <Provider store={store}>
-    <Game />
+    <Rank />
   </Provider>
 , document.getElementById('root'));
 
