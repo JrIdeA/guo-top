@@ -1,4 +1,4 @@
-const { values, each, sortBy, map, every, reverse } = require('lodash');
+const { values, each, sortBy, map, every, reverse, shuffle } = require('lodash');
 const CreateGameUser = require('../../game-user');
 const { logger } = require('../../utils');
 
@@ -9,6 +9,7 @@ const GameUsersProto = {
     this._onlineUsers = {};
     this.GameUser = CreateGameUser(this);
     this.resultRankList = [];
+    this.finalGroup = [];
 
     this.onStatusChange.ending(() => {
       each(this._loginedUsers, (user) => {
@@ -54,6 +55,18 @@ const GameUsersProto = {
 
     logger.debug('game end and calculated rank result list', this.resultRankList);
   },
+  _calculateFinalGroup() {
+    const shuffledRankList = shuffle(this.resultRankList);
+    const group = [];
+    for (let index = 0; index < shuffledRankList.length; index += 2) {
+      group.push({
+        group: Math.ceil(index + 1),
+        competitor1: shuffledRankList[index].userId,
+        competitor2: shuffledRankList[index + 1].userId,
+      });
+    }
+    this.finalGroup = group;
+  },
   getUserByAuth(token) {
     const userId = this._tokenIdMap[token];
     if (!userId) {
@@ -90,6 +103,9 @@ const GameUsersProto = {
   },
   getResultRankList() {
     return this.resultRankList;
+  },
+  getFinalGroup() {
+    return this.finalGroup;
   },
 };
 
