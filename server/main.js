@@ -45,6 +45,12 @@ app.get('/api/game', (req, res) => {
     stadiumLink: game.isStatusAfter('ready') ? '/game' : undefined,
   });
 });
+app.get('/api/result', (req, res) => {
+  const status = game.getStatus();
+  res.send({
+    status,
+  });
+});
 app.use(express.static(path.join(__dirname, '../client/static')));
 
 const server = http.createServer(app);

@@ -21,7 +21,10 @@ export default class Home extends Component {
       );
     }
     return (
-      <button className="btn btn-primary disabled">游戏已结束</button>
+      <button 
+        className="btn btn-primary disabled"
+        onClick={() => window.location.href = '/rank'}
+      >游戏已结束</button>
     );
   }
   renderIntro() {
