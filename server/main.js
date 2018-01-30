@@ -27,7 +27,15 @@ const game = new Game(config.game, questionsData);
 game.registerUser('yejiren', 'yejiren'); // test
 game.registerUser('wangmeiling', 'wangmeiling');
 
-app.get('/', express.static(path.join(__dirname, '../client/public')));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/static/home.html'));
+});
+app.get('/game', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/static/game.html'));
+});
+app.get('/rank', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/static/rank.html'));
+});
 app.get('/api/game', (req, res) => {
   const status = game.getStatus();
   res.send({
@@ -37,6 +45,7 @@ app.get('/api/game', (req, res) => {
     stadiumLink: game.isStatusAfter('ready') ? '/game' : undefined,
   });
 });
+app.use(express.static(path.join(__dirname, '../client/static')));
 
 const server = http.createServer(app);
 

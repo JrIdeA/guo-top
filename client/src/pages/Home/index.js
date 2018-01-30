@@ -1,3 +1,5 @@
 import Container from './Container';
-export * from './state';
-export default Container;
+import { initState, reducers, sagas } from './state';
+import entry from '../../entry';
+
+entry(reducers, initState, sagas, Container);

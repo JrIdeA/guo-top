@@ -7,7 +7,6 @@ function formatTime(time) {
   return moment(time).format('YYYY-MM-DD HH:mm:ss');
 }
 
-export const root = 'home';
 export const initState = {
   status: '',
   readyTime: 0,

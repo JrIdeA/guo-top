@@ -1,4 +1,8 @@
 import Container from './Container';
-export { initWs } from './communicate';
-export * from './state';
-export default Container;
+import { initState, reducers, sagas } from './state';
+import entry from '../../entry';
+import { initWs } from './communicate';
+
+entry(reducers, initState, sagas, Container, (store) => {
+  initWs(store.dispatch);
+});
