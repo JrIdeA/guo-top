@@ -46,13 +46,13 @@ class GameUserStatistic {
     log.usedClientTime = log.answerClientTime - log.getQuestionClientTime;
     log.usedServerTime = log.answerServerTime - log.getQuestionServerTime;
   }
-  getUsedSeconds() {
+  getUsedTime() {
     return values(this.answerLog).reduce((p, { usedServerTime }) => {
       usedServerTime = +usedServerTime;
       if (Number.isNaN(usedServerTime)) {
         return p;
       }
-      return p + (usedServerTime / 1000);
+      return p + usedServerTime;
     }, 0);
   }
 }

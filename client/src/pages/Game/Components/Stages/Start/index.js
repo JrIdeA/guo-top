@@ -53,7 +53,7 @@ export default class StagesStart extends Component {
   renderStatistics() {
     return (
       <div>
-        当前得分：{this.props.count.point}
+        当前得分：{this.props.score.point}
       </div>
     );
   }

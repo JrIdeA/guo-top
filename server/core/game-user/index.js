@@ -78,9 +78,7 @@ function createGameUser(game) {
       };
     }
     isTimeout() {
-      // return game.status.ending;
-      // TODO
-      return false;
+      return !(this.getLeftPlaytime() > 0);
     }
     giveupCurrentQuizIfNotAnswer() {
       const current = this.questionQueue.getCurrent();
@@ -93,17 +91,21 @@ function createGameUser(game) {
         });
       }
     }
-    getLeftPlaytimeSeconds() {
+    getLeftPlaytime() {
       if (this.gameEnded) return -1;
-      const playtimeSeconds = game.getPlaytimeSeconds();
-      const usedSeconds = this.stat.getUsedSeconds();
-      return playtimeSeconds - usedSeconds;
+      const playtime = game.getPlaytimeSeconds() * 1000;
+      const usedTime = this.stat.getUsedTime();
+      const leftDeadTime = game.getLeftDeadTime();
+
+      return Math.min(leftDeadTime, playtime - usedTime);
     }
     endGame(clientTime) {
-      this.gameEnded = true;
-      this.giveupCurrentQuizIfNotAnswer();
-      this.stat.markEndTime(clientTime);
-      game.userEndGame();
+      if (!this.gameEnded) {
+        this.gameEnded = true;
+        this.giveupCurrentQuizIfNotAnswer();
+        this.stat.markEndTime(clientTime);
+        game.userEndGame();
+      }
     }
     isEnd() {
       return this.gameEnded;
@@ -111,7 +113,7 @@ function createGameUser(game) {
     setRank(rank) {
       this.rank = rank;
     }
-    getResult() {
+    getScore() {
       if (!game.status.result) {
         return this.getCount();
       }

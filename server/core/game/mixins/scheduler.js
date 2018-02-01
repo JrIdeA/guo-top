@@ -83,8 +83,8 @@ const GameSchedulerProto = {
   getLeftStartTime() {
     return this.startTime - Date.now();
   },
-  getLeftEndTime() {
-    return Date.now() - this.endTime;
+  getLeftDeadTime() {
+    return this.deadTime - Date.now();
   },
 };
 

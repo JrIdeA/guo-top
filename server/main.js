@@ -96,18 +96,18 @@ wss.on('connection', (ws) => {
             const status = game.getStatus();
             const extendData = {};
             if (status === 'ready') {
-              extendData.leftTime = game.getLeftStartTime();
-              extendData.startTime = game.getStartTime();
-            } else if (status === 'start') {
+              extendData.leftStartTime = game.getLeftStartTime();
+            } if (status === 'start') {
               user.giveupCurrentQuizIfNotAnswer();
-              extendData.leftPlaytimeSeconds = user.getLeftPlaytimeSeconds();
+              extendData.leftPlaytime = user.getLeftPlaytime();
             }
             return response.send.welcome(Object.assign(extendData, {
               userId: user.id,
-              gameStatus: game.getStatus(),
+              status: game.getStatus(),
+              startTime: game.getStartTime(),
               playtimeSeconds: game.getPlaytimeSeconds(),
-              onlineUser: game.getOnlineUserCount(),
-              count: user.getResult(),
+              onlineUserCount: game.getOnlineUserCount(),
+              score: user.getScore(),
             }));
           },
         ],
@@ -121,19 +121,20 @@ wss.on('connection', (ws) => {
           response.error.gameInIdle();
         }],
         ['ready', () => {
-          const leftTime = game.getLeftStartTime();
           const startTime = game.getStartTime();
 
           response.error.gameNotStart({
-            leftTime,
             startTime,
-            gameStatus: game.getStatus(),
+            status: game.getStatus(),
             playtimeSeconds: game.getPlaytimeSeconds(),
           });
         }],
         [['start'], () => {
           if (user.isTimeout()) {
-            response.error.gameEndResulted();
+            user.endGame(clientTime);
+            response.error.gameEnding({
+              score: user.getScore(),
+            });
             return;
           }
           const nextQuiz = user.getNextQuiz();
@@ -145,10 +146,12 @@ wss.on('connection', (ws) => {
           response.send.question(nextQuiz);
         }],
         ['ending', () => {
-          response.error.gameEnding();
+          response.error.gameEnding({
+            score: user.getScore(),
+          });
         }],
         ['result', () => {
-          response.send.gameResult(user.getResult());
+          response.send.gameResult(user.getScore());
         }],
       ]);
     },
@@ -161,10 +164,12 @@ wss.on('connection', (ws) => {
           response.error.gameInIdle();
         }],
         ['ending', () => {
-          response.error.gameEnding();
+          response.error.gameEnding({
+            score: user.getScore(),
+          });
         }],
         ['result', () => {
-          response.send.gameResult(user.getResult());
+          response.send.gameResult(user.getScore());
         }],
         [['start'], () => {
           const answerResult = user.answerQuiz(
@@ -193,7 +198,7 @@ wss.on('connection', (ws) => {
           response.error.gameInIdle();
         }],
         ['result', () => {
-          response.send.gameResult(user.getResult());
+          response.send.gameResult(user.getScore());
         }],
         [['start'], () => {
           user.endGame(time);
@@ -204,7 +209,7 @@ wss.on('connection', (ws) => {
 
   game.onStatusChange.result(() => {
     if (user) {
-      response.send.gameResult(user.getResult());
+      response.send.gameResult(user.getScore());
     }
   });
 

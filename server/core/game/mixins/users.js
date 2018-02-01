@@ -1,4 +1,4 @@
-const { values, each, sortBy, map, every, reverse, shuffle } = require('lodash');
+const { values, each, sortBy, map, every, reverse, shuffle, size } = require('lodash');
 const CreateGameUser = require('../../game-user');
 const { logger } = require('../../utils');
 
@@ -12,6 +12,9 @@ const GameUsersProto = {
     this.finalGroup = [];
 
     this.onStatusChange.ending(() => {
+      if (size(this._loginedUsers) === 0) {
+        this.status.result = true;
+      }
       each(this._loginedUsers, (user) => {
         if (!user.isEnd()) {
           user.endGame();
@@ -86,11 +89,11 @@ const GameUsersProto = {
   },
   onlineUser(user) {
     this._onlineUsers[user.id] = user;
-    logger.debug('user online', user);
+    logger.debug('user online', user.id);
   },
   offlineUser(user) {
     delete this._onlineUsers[user.id];
-    logger.debug('user offline', user);
+    logger.debug('user offline', user.id);
   },
   getOnlineUserCount() {
     return Object.keys(this._onlineUsers).length;

@@ -27,9 +27,8 @@ export const initState = {
     status: '',
     startTime: 0,
     playtimeSeconds: 0,
-    prepareCountdown: 0,
   },
-  count: {
+  score: {
     total: 0,
     wrong: 0,
     correct: 0,
@@ -102,38 +101,51 @@ export const reducers = {
       true
     );
   },
-  [ERROR_GAME_NOT_START](state, { leftTime, startTime, gameStatus, playtimeSeconds }) {
+  [ERROR_GAME_NOT_START](state, { 
+    startTime, 
+    leftStartTime,
+    status,
+    playtimeSeconds,
+  }) {
     return {
       ...state,
       game: {
         ...state.game,
-        status: gameStatus,
+        status: status,
         startTime,
         playtimeSeconds,
       },
       control: {
         ...state.control,
-        startTime: leftTime + Date.now(),
+        startTime: leftStartTime + Date.now(),
       },
     };
   },
   [WS_SERVER_WELCOME](state, payload) {
-    const { userId, gameStatus, count, leftTime, startTime, playtimeSeconds, leftPlaytimeSeconds } = payload;
+    const { 
+      userId, 
+      status, 
+      score, 
+      leftStartTime, 
+      startTime, 
+      playtimeSeconds,
+      leftPlaytime,
+    } = payload;
+
     return {
       ...state,
       userId,
       game: {
-        status: gameStatus,
-        count: count,
+        status,
         startTime,
         playtimeSeconds,
-        leftPlaytimeSeconds,
       },
       control: {
         ...state.control,
-        startTime: leftTime + Date.now(),
+        leftPlaytime,
+        startTime: leftStartTime + Date.now(),
       },
-      count,
+      score,
     };
   },
   [ERROR_USER_NOT_REGISTER](state, payload) {
@@ -197,14 +209,14 @@ export const reducers = {
     };
   },
   [actionTypes.startGame](state) {
-    let leftSeconds;
+    let leftPlaytime;
     if (state.game.status === 'start') {
-      leftSeconds = state.game.leftPlaytimeSeconds;
+      leftPlaytime = state.control.leftPlaytime;
     } else {
-      leftSeconds = state.game.playtimeSeconds;
+      leftPlaytime = state.game.playtimeSeconds * 1000;
     }
     const now = Date.now();
-    const endTime = now + leftSeconds * 1000;
+    const endTime = now + leftPlaytime;
 
     return {
       ...state,
@@ -235,14 +247,18 @@ export const reducers = {
   },
 };
 export const sagas = [
-  takeLatest(WS_SERVER_GAME_INFO, function* ({ userId, gameStatus }) {
+  takeLatest(WS_SERVER_GAME_INFO, function* () {
     const ws = yield select(state => state.ws);
     ws.sendTicket();
   }),
-  takeLatest(WS_SERVER_WELCOME, function* ({ payload: { gameStatus, leftTime } }) {
-    if (gameStatus === 'ready' && leftTime) {
+  takeLatest(WS_SERVER_WELCOME, function* ({
+    payload: { 
+      status,
+    },
+  }) {
+    if (status === 'ready') {
       yield put(actions.startPrepareCountdown());
-    } else if (gameStatus === 'start') {
+    } else if (status === 'start') {
       yield put(actions.startGame());
     }
   }),

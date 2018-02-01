@@ -21,8 +21,8 @@ export default class Home extends Component {
         <div>
           <h2>排名：</h2>
           <ul>
-            {this.props.rankList.map(count => (
-              <li>{count.rank} {count.userId} （得分：{count.point}，正确率：{count.accuracy}）</li>
+            {this.props.rankList.map(score => (
+              <li>{score.rank} {score.userId} （得分：{score.point}，正确率：{score.accuracy}）</li>
             ))}
           </ul>
         </div>
