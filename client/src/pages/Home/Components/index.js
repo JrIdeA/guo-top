@@ -12,7 +12,7 @@ export default class Home extends Component {
       return (
         <button className="btn btn-primary disabled">将于 {this.props.readyTimeFormatted} 开启</button>
       );
-    } if (this.props.status === 'ready' || !this.props.status === 'start') {
+    } if (this.props.status === 'ready' || this.props.status === 'start') {
       return (
         <button 
           className="btn btn-primary btn-primary"

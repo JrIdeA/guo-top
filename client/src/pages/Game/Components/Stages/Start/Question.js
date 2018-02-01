@@ -1,11 +1,37 @@
+/* eslint no-cond-assign: 0 */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { isEqual } from 'lodash';
+
+function findBreakPoint(text, width, context) {
+  let min = 0;
+  let max = text.length - 1;
+  context.measureText(text);
+  while (min <= max) {
+    const middle = Math.floor((min + max) / 2);
+    const middleWidth = context.measureText(text.substr(0, middle)).width;
+    const oneCharWiderThanMiddleWidth = context.measureText(text.substr(0, middle + 1)).width;
+    if (middleWidth <= width && oneCharWiderThanMiddleWidth > width) {
+      return middle;
+    }
+    if (middleWidth < width) {
+      min = middle + 1;
+    } else {
+      max = middle - 1;
+    }
+  }
+   
+  return -1;
+}
 
 export default class Question extends Component {
   static propTypes = {
     question: PropTypes.string,
   };
+  constructor(props) {
+    super(props);
+    this.lineHeight = 24 * (window.devicePixelRatio || 1);
+  }
   componentDidMount() {
 
   }
@@ -21,31 +47,58 @@ export default class Question extends Component {
   initCanvas(canvas) {
     if (canvas && !this.canvas) {
       const canvasCtx = canvas.getContext('2d');
+      this.canvas = canvas;
+      this.canvasCtx = canvas.getContext('2d');
+
       const devicePixelRatio = window.devicePixelRatio || 1;
       const backingStoreRatio = canvasCtx.webkitBackingStorePixelRatio ||
         canvasCtx.mozBackingStorePixelRatio ||
         canvasCtx.msBackingStorePixelRatio ||
         canvasCtx.oBackingStorePixelRatio ||
         canvasCtx.backingStorePixelRatio || 1;
-      const ratio = devicePixelRatio / backingStoreRatio;
-      canvas.style.width = `${canvas.width}px`;
-      canvas.style.height = `${canvas.height}px`;
-      canvas.parentNode.style.width = canvas.style.width;
-      canvas.width = canvas.width * ratio;
-      canvas.height = canvas.height * ratio;
-      canvasCtx.fillStyle = 'white';
-      canvasCtx.font = '48px serif';
+      this.ratio = devicePixelRatio / backingStoreRatio;
+      this.setCanvasWidth(300);
+      this.setCanvasHeight(300);
 
-      
-      this.canvas = canvas;
-      this.canvasCtx = canvas.getContext('2d');
       window.canvasCtx = this.canvasCtx;
     }
   };
+  setCanvasWidth(width) {
+    const canvas = this.canvas;
+    canvas.width = width * this.ratio;
+    canvas.style.width = `${width}px`;
+    canvas.parentNode.style.width = canvas.style.width;
+  }
+  setCanvasHeight(height) {
+    const canvas = this.canvas;
+    canvas.height = height * this.ratio;
+    canvas.style.height = `${height}px`;
+  }
+
   drawQuestion(props) {
-    console.log('drawQuestion', props.question)
     this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.canvasCtx.fillText(props.question, 10, 50);
+    const context = this.canvasCtx
+    context.fillStyle = 'white';
+    context.font = `${16 * this.ratio}px serif`;
+
+    let text = props.question;
+    let breakPoint = 0;
+    const result = [];
+    while ((breakPoint = findBreakPoint(text, this.canvas.width, context)) !== -1) {
+      result.push(text.substr(0, breakPoint));
+      text = text.substr(breakPoint);
+    }
+    if (text) {
+      result.push(text);
+    }
+    const height = (result.length + 1) * this.lineHeight;
+    this.setCanvasHeight(height);
+    context.fillStyle = 'white';
+    context.font = `${16 * this.ratio}px serif`;
+
+    result.forEach((line, index) => {
+      context.fillText(line, 0, this.lineHeight * (index + 1));
+    });
   }
   shouldComponentUpdate(nextProps) {
     if (!this.props.question || !this.canvas) {
