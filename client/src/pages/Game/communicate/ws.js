@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+import lz from 'lz-string';
 import { logger } from '../../../core';
 import {
   WS_CLIENT_TICKET,
@@ -29,6 +30,7 @@ function encodeMessage(data) {
 };
 function decodeMessage(message) {
   try {
+    message = lz.decompressFromUTF16(message);
     return JSON.parse(message);
   } catch (err) {
     return {};
@@ -41,8 +43,8 @@ const gameWs = {
   connect() {
     const ws = new window.WebSocket(`ws://localhost:8000/socket`);
     ws.addEventListener('message', (e) => {
-      logger.log('ws: get message', e.data);
       const data = decodeMessage(e.data);
+      logger.log('ws: get message', data);
       if (data.error) {
         gameWs.dispatch(getActionByError(data));
       } else if (data.type) {
@@ -69,7 +71,7 @@ const gameWs = {
   },
   sendTicket() {
     // const token = Cookies.get('token');
-    const token = window.location.pathname.replace(/^\//, '');
+    const token = 'yejiren';
     this.send({ 
       type: WS_CLIENT_TICKET, 
       payload: { token } 

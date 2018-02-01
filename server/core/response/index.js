@@ -1,3 +1,4 @@
+const lz = require('lz-string');
 const {
   ERROR_BAD_REQUEST,
   ERROR_QUESTION_OPTIONS_INVALID,
@@ -23,7 +24,9 @@ const {
 
 module.exports = function createWsReponse(ws) {
   const send = (messageJson) => {
-    ws.send(JSON.stringify(messageJson));
+    let message = JSON.stringify(messageJson);
+    message = lz.compressToUTF16(message);
+    ws.send(message);
   };
   const sendError = errorType => () => send({
     type: WS_SERVER_ERROR,
