@@ -67,7 +67,7 @@ function createGameUser(game) {
         correct,
       };
     }
-    getCount() {
+    getScore() {
       return {
         total: this.stat.total,
         correct: this.stat.correct,
@@ -113,13 +113,13 @@ function createGameUser(game) {
     setRank(rank) {
       this.rank = rank;
     }
-    getScore() {
+    getResult() {
       if (!game.status.result) {
-        return this.getCount();
+        return this.getScore();
       }
       return Object.assign({
         rank: this.rank,
-      }, this.getCount());
+      }, this.getScore());
     }
   };
 }

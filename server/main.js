@@ -107,7 +107,7 @@ wss.on('connection', (ws) => {
               startTime: game.getStartTime(),
               playtimeSeconds: game.getPlaytimeSeconds(),
               onlineUserCount: game.getOnlineUserCount(),
-              score: user.getScore(),
+              score: user.getResult(),
             }));
           },
         ],
@@ -122,9 +122,11 @@ wss.on('connection', (ws) => {
         }],
         ['ready', () => {
           const startTime = game.getStartTime();
+          const leftStartTime = game.getLeftStartTime();
 
           response.error.gameNotStart({
             startTime,
+            leftStartTime,
             status: game.getStatus(),
             playtimeSeconds: game.getPlaytimeSeconds(),
           });
@@ -133,7 +135,7 @@ wss.on('connection', (ws) => {
           if (user.isTimeout()) {
             user.endGame(clientTime);
             response.error.gameEnding({
-              score: user.getScore(),
+              score: user.getResult(),
             });
             return;
           }
@@ -147,11 +149,11 @@ wss.on('connection', (ws) => {
         }],
         ['ending', () => {
           response.error.gameEnding({
-            score: user.getScore(),
+            score: user.getResult(),
           });
         }],
         ['result', () => {
-          response.send.gameResult(user.getScore());
+          response.send.gameResult(user.getResult());
         }],
       ]);
     },
@@ -165,11 +167,11 @@ wss.on('connection', (ws) => {
         }],
         ['ending', () => {
           response.error.gameEnding({
-            score: user.getScore(),
+            score: user.getResult(),
           });
         }],
         ['result', () => {
-          response.send.gameResult(user.getScore());
+          response.send.gameResult(user.getResult());
         }],
         [['start'], () => {
           const answerResult = user.answerQuiz(
@@ -185,7 +187,7 @@ wss.on('connection', (ws) => {
             questionId: answerResult.questionId,
             answerCode: answerResult.answerCode,
             correct: answerResult.correct,
-            count: user.getCount(),
+            score: user.getResult(),
           });
         }],
       ]);
@@ -198,7 +200,7 @@ wss.on('connection', (ws) => {
           response.error.gameInIdle();
         }],
         ['result', () => {
-          response.send.gameResult(user.getScore());
+          response.send.gameResult(user.getResult());
         }],
         [['start'], () => {
           user.endGame(time);
@@ -209,7 +211,7 @@ wss.on('connection', (ws) => {
 
   game.onStatusChange.result(() => {
     if (user) {
-      response.send.gameResult(user.getScore());
+      response.send.gameResult(user.getResult());
     }
   });
 

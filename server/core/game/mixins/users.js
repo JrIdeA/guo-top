@@ -28,9 +28,9 @@ const GameUsersProto = {
   _calculateResultRank() {
     const rankedList = reverse(sortBy(
       map(this._loginedUsers, (user) => {
-        const count = user.getCount();
-        count.userId = user.id;
-        return count;
+        const score = user.getScore();
+        score.userId = user.id;
+        return score;
       }),
       ['point', 'accuracy', 'total']
     ));

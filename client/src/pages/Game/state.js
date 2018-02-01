@@ -177,7 +177,7 @@ export const reducers = {
   [WS_SERVER_SEND_ANSWER_RESULT](state, {
     questionId,
     correct,
-    count,
+    score,
   }) {
     if (questionId != state.question.id) {
       return state;
@@ -188,7 +188,7 @@ export const reducers = {
         ...state.question,
         correct,
       },
-      count,
+      score,
     };
   },
   [WS_SERVER_SEND_ANSWERED_ALL](state) {
@@ -198,10 +198,10 @@ export const reducers = {
       true
     );
   },
-  [WS_SERVER_SEND_GAME_RESULT](state, count) {
+  [WS_SERVER_SEND_GAME_RESULT](state, score) {
     return {
       ...state,
-      count,
+      score,
       game: {
         ...state,
         status: 'result',
