@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import createReducer from './createReducer';
 import createSaga from './createSaga';
 import createStore from './createStore';
+import './styles';
 
 export default function entry(reducerFrames, initState, sagas, Container, storeCreated) {
   const reducer = createReducer(reducerFrames, initState);

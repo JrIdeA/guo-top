@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './pacman.css';
+import './index.css';
 
 export default class Home extends Component {
   handleEnterStadium = () => {
@@ -24,12 +24,12 @@ export default class Home extends Component {
       <button 
         className="btn btn-primary disabled"
         onClick={() => window.location.href = '/rank'}
-      >游戏已结束</button>
+      >游戏已结束，查看结果</button>
     );
   }
   renderIntro() {
     return (
-      <div>
+      <main>
         <h1>百万榛果冲顶大会</h1>
         <div>
           <h2>介绍：</h2>
@@ -42,10 +42,10 @@ export default class Home extends Component {
           <p>答题正确得一分，答题错误扣一分，每题必答不能跳过。</p>
           <p>答题结束后将统计所有人的得分，得分前 16 名将进入决赛进行两两 PK 角逐榛果知识王者的称号。</p>
         </div>
-        <div>
+        <div className="btn-wrap">
           {this.renderButton()}
         </div>
-      </div>
+      </main>
     );
   }
   renderLoading() {

@@ -1,0 +1,22 @@
+html, body {
+  background-color: rgb(252, 208, 54) !important;
+  background-image: url(http://s3.meituan.net/v1/mss_65766da973d14523b3d781fe3ac2bbac/op-assets/imgs/2018-02-02-030621.png);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-size: 354px 160px;
+}
+main {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 0 10px;
+}
+
+main h1 {
+  text-align: center;
+}
+
+main .btn-wrap {
+  text-align: center;
+  margin-top: 100px;
+}
