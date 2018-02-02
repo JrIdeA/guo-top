@@ -70,8 +70,7 @@ const gameWs = {
     gameWs.ws = null;
   },
   sendTicket() {
-    // const token = Cookies.get('token');
-    const token = 'yejiren';
+    const token = Cookies.get('gtt');
     this.send({ 
       type: WS_CLIENT_TICKET, 
       payload: { token } 

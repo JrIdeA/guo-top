@@ -2,6 +2,8 @@ const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
 const fs = require('fs');
+const express = require('express');
+const cookieParser = require('cookie-parser');
 const { logger } = require('./core/utils');
 const config = require('../config');
 const {
@@ -17,16 +19,27 @@ process.on('uncaughtException', (e) => {
   logger.error('process uncaughtException', e);
 });
 
-const express = require('express');
 const app = express();
 
 const questionsData = JSON.parse(fs.readFileSync(path.join(
   __dirname, '../data/questions/index.json'
 )));
 const game = new Game(config.game, questionsData);
-game.registerUser('yejiren', 'yejiren'); // test
-game.registerUser('wangmeiling', 'wangmeiling');
 
+const userTokenData = JSON.parse(fs.readFileSync(path.join(
+  __dirname, '../data/token/token.json'
+)));
+userTokenData.forEach(({ token, name }) => {
+  game.registerUser(name, token);
+});
+
+app.use(cookieParser());
+app.use((req, res, next) => {
+  if (req.query.u) {
+    res.cookie('gtt', req.query.u);
+  }
+  next();
+});
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/static/home.html'));
 });
