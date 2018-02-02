@@ -1,3 +1,7 @@
+:focus {
+  outline: none;
+}
+
 .btn {
   background-color: transparent;
   border: #fff 2px solid;
@@ -10,13 +14,16 @@
   background-color: #fff;
   border-color: #fff;
 }
+
+.btn.disabled,
 .btn.disabled.focus, 
 .btn.disabled:focus, 
 .btn.disabled:hover, 
 .btn[disabled].focus, 
 .btn[disabled]:focus, 
-.btn[disabled]:hover, 
-fieldset[disabled] .btn.focus, 
-fieldset[disabled] .btn:focus, 
-fieldset[disabled] .btn:hover {
+.btn[disabled]:hover {
+  background: #dadada;
+  border-color: #dadada;
+  color: #5a5a5a;
+  cursor: default;
 }

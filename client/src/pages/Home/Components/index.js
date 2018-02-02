@@ -10,19 +10,19 @@ export default class Home extends Component {
   renderButton() {
     if (this.props.status === 'idle') {
       return (
-        <button className="btn btn-primary disabled">将于 {this.props.readyTimeFormatted} 开启</button>
+        <button className="btn disabled">赛场入口将于 {this.props.readyTimeFormatted} 开启</button>
       );
     } if (this.props.status === 'ready' || this.props.status === 'start') {
       return (
         <button 
-          className="btn btn-primary btn-primary"
+          className="btn"
           onClick={this.handleEnterStadium}
         >进入赛场</button>
       );
     }
     return (
       <button 
-        className="btn btn-primary disabled"
+        className="btn disabled"
         onClick={() => window.location.href = '/rank'}
       >游戏已结束，查看结果</button>
     );
