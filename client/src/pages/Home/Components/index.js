@@ -22,7 +22,7 @@ export default class Home extends Component {
     }
     return (
       <button 
-        className="btn disabled"
+        className="btn"
         onClick={() => window.location.href = '/rank'}
       >游戏已结束，查看结果</button>
     );
