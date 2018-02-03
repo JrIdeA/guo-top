@@ -76,7 +76,6 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({
   server,
   verifyClient() {
-    console.log('ding dong');
     return true;
   },
 });
@@ -116,6 +115,12 @@ wss.on('connection', (ws) => {
             if (status === 'ready') {
               extendData.leftStartTime = game.getLeftStartTime();
             } if (status === 'start') {
+              if (user.isEnd()) {
+                response.error.gameEnding({
+                  score: user.getScore(),
+                });
+                return undefined;
+              }
               user.giveupCurrentQuizIfNotAnswer();
               extendData.leftPlaytime = user.getLeftPlaytime();
             }
@@ -150,10 +155,13 @@ wss.on('connection', (ws) => {
           });
         }],
         [['start'], () => {
-          if (user.isTimeout()) {
+          if (
+            user.isTimeout() ||
+            user.isEnd()
+          ) {
             user.endGame(clientTime);
             response.error.gameEnding({
-              score: user.getResult(),
+              score: user.getScore(),
             });
             return;
           }
@@ -167,7 +175,7 @@ wss.on('connection', (ws) => {
         }],
         ['ending', () => {
           response.error.gameEnding({
-            score: user.getResult(),
+            score: user.getScore(),
           });
         }],
         ['result', () => {
@@ -222,6 +230,9 @@ wss.on('connection', (ws) => {
         }],
         [['start'], () => {
           user.endGame(time);
+          response.error.gameEnding({
+            score: user.getScore(),
+          });
         }],
       ]);
     },
@@ -235,6 +246,11 @@ wss.on('connection', (ws) => {
 
   ws.on('message', (msgStr) => {
     logger.debug('get message', msgStr);
+    if (msgStr === 'hb') {
+      logger.debug('client heartbeat');
+      ws.send('hb');
+      return undefined;
+    }
 
     let message;
     try {
@@ -257,18 +273,12 @@ wss.on('connection', (ws) => {
       user.offline();
     }
   });
-  ws.on('headers', (...args) => {
-    console.log('on headers', args);
-  });
-  ws.on('listening', (...args) => {
-    console.log('on listening', args);
-  });
 });
 
 wss.on('error', (err) => {
-  console.error('wss error', err);
+  logger.error('wss error', err);
 });
 
 server.listen(config.port, () => {
-  console.log('Server started!');
+  logger.log(`Server started at ${config.port}`);
 });

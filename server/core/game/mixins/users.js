@@ -39,7 +39,7 @@ const GameUsersProto = {
         score.userId = user.id;
         return score;
       }),
-      ['point', 'accuracy', 'total']
+      ['point', 'accuracy', 'total', 'usedTime']
     ));
     const resultRankList = [];
     let rank = 0;

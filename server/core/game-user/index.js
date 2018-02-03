@@ -75,6 +75,7 @@ function createGameUser(game) {
         point: this.stat.point,
         accuracy: this.stat.total ?
           ((this.stat.correct / this.stat.total) * 100).toFixed(2) : 0,
+        usedTime: this.stat.getUsedTime(),
       };
     }
     isTimeout() {

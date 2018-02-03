@@ -1,3 +1,5 @@
+import logger from '../utils/logger';
+
 const { isArray, isPlainObject, isString, isNil, shuffle } = require('lodash');
 const QuestionQueue = require('./queue');
 const {
@@ -15,7 +17,13 @@ function normalizeQuestionsData(questionsData) {
     if (isNil(answer) || !options[answer]) return false;
     return true;
   };
-  return questionsData.filter(isValidQuestion).map((questionData, index) => (Object.assign({
+  return questionsData.filter((questionData) => {
+    const valid = isValidQuestion(questionData);
+    if (!valid) {
+      logger.debug('invalid question', questionData);
+    }
+    return valid;
+  }).map((questionData, index) => (Object.assign({
     id: index + 1,
   }, questionData)));
 }
@@ -28,6 +36,9 @@ class QuestionsManager {
       throw questionsData;
     }
     this.normalizedQuestionsData = normalizeQuestionsData(questionsData);
+
+    logger.debug('import questions length', questionsData.length);
+    logger.debug('valid questions length', this.normalizedQuestionsData.length);
   }
   getRandomQueue() {
     const normalizedQuestionsData = shuffle(this.normalizedQuestionsData);

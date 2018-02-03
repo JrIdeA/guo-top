@@ -19,10 +19,11 @@ function getActionByMessage({ type, data }) {
     payload: data,
   };
 }
-function getActionByError({ error }) {
+function getActionByError({ error, data }) {
   const actionType = wsStatusToActionType(error, true);
   return {
     type: actionType,
+    payload: data,
   };
 }
 function encodeMessage(data) {
@@ -43,6 +44,7 @@ const gameWs = {
   connect() {
     const ws = new window.WebSocket(`ws://${window.location.host}/socket`);
     ws.addEventListener('message', (e) => {
+      if (e.data === 'hb') return;
       const data = decodeMessage(e.data);
       logger.log('ws: get message', data);
       if (data.error) {
@@ -59,6 +61,10 @@ const gameWs = {
       gameWs.dispatch(getActionByError({ error: ERROR_CONNECT_CLOSED }));
     });
     gameWs.ws = ws;
+    // heartbeat for keeping connection
+    setInterval(() => {
+      ws.send('hb');
+    }, 30000);
   },
   send(data) {
     logger.log('ws: send message', data);

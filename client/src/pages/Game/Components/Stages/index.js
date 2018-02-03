@@ -3,6 +3,7 @@ import Joining from './Joining';
 import Ready from './Ready';
 import Start from './Start';
 import AnsweredAll from './AnsweredAll';
+import Ending from './Ending';
 import Result from './Result';
 
 export default class GameStage extends Component {
@@ -17,6 +18,8 @@ export default class GameStage extends Component {
         <Start {...this.props} />;
     } else if (status === 'result') {
       stage = <Result {...this.props} />
+    } else if (status === 'ending') {
+      stage = <Ending {...this.props} />
     } else {
       stage = <Joining {...this.props} />
     }

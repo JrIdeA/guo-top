@@ -1,10 +1,10 @@
 module.exports = {
   game: {
-    startTime: '2018-02-03 15:16:00',
+    startTime: '2018-02-04 02:14:00',
     prepareSeconds: 3,
-    readySeconds: 300,
-    playtimeSeconds: 300,
-    allowOvertimeSeconds: 300,
+    readySeconds: 3000,
+    playtimeSeconds: 100,
+    allowOvertimeSeconds: 60,
   },
   port: 8000,
 };

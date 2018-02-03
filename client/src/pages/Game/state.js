@@ -12,6 +12,7 @@ import {
   ERROR_USER_NOT_REGISTER,
   ERROR_USRE_ALREADY_ANSWERED,
   ERROR_GAME_NOT_START,
+  ERROR_GAME_ENDING,
   WS_CLIENT_SEND_ANSWER,
   WS_SERVER_GAME_INFO,
   WS_SERVER_WELCOME,
@@ -111,7 +112,7 @@ export const reducers = {
       ...state,
       game: {
         ...state.game,
-        status: status,
+        status,
         startTime,
         playtimeSeconds,
       },
@@ -208,6 +209,17 @@ export const reducers = {
       },
     };
   },
+  [ERROR_GAME_ENDING](state, { score }) {
+    if (state.game.status === 'result') return state;
+    return {
+      ...state,
+      score,
+      game: {
+        ...state,
+        status: 'ending',
+      },
+    };
+  },
   [actionTypes.startGame](state) {
     let leftPlaytime;
     if (state.game.status === 'start') {
@@ -271,8 +283,13 @@ export const sagas = [
   takeLatest(ERROR_USRE_ALREADY_ANSWERED, function* () {
     toast('该题已经答过啦~', {
       type: 'error',
-      autoClose: 3000,
+      autoClose: 1000,
     });
+    yield delay(1000);
+    yield put(actions.getQuestion());
+  }),
+  takeLatest(ERROR_GAME_NOT_START, function* () {
+    yield put(actions.startPrepareCountdown());
   }),
   takeLatest(WS_SERVER_SEND_ANSWER_RESULT, function* () {
     yield call(delay, 300);

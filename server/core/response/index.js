@@ -28,9 +28,10 @@ module.exports = function createWsReponse(ws) {
     message = lz.compressToUTF16(message);
     ws.send(message);
   };
-  const sendError = errorType => () => send({
+  const sendError = errorType => payload => send({
     type: WS_SERVER_ERROR,
     error: errorType,
+    data: payload,
   });
   const sendSuccess = type => payload => send({
     type,
