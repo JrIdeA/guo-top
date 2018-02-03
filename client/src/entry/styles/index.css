@@ -7,6 +7,12 @@ html, body {
   background-size: 354px 160px;
 }
 
+main {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 0 10px;
+}
+
 :focus {
   outline: none;
 }

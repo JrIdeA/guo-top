@@ -1,7 +1,7 @@
 /* eslint no-cond-assign: 0 */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { isEqual } from 'lodash';
+import { isEqual, throttle } from 'lodash';
 
 function findBreakPoint(text, width, context) {
   let min = 0;
@@ -30,10 +30,14 @@ export default class Question extends Component {
   };
   constructor(props) {
     super(props);
-    this.lineHeight = 24 * (window.devicePixelRatio || 1);
+    this.devicePixelRatio = window.devicePixelRatio || 1;
+    this.fontSize = 32;
+    this.lineHeight = this.fontSize * 1.2 * devicePixelRatio;
+    this.resizeHandle = throttle(this.resizeHandle.bind(this), 200);
+    window.addEventListener('resize', this.resizeHandle);
   }
-  componentDidMount() {
-
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resizeHandle);
   }
   componentWillReceiveProps(nextProps) {
     if (!isEqual(this.props.question, nextProps.question)) {
@@ -50,20 +54,21 @@ export default class Question extends Component {
       this.canvas = canvas;
       this.canvasCtx = canvas.getContext('2d');
 
-      const devicePixelRatio = window.devicePixelRatio || 1;
+      const devicePixelRatio = this.devicePixelRatio;
       const backingStoreRatio = canvasCtx.webkitBackingStorePixelRatio ||
         canvasCtx.mozBackingStorePixelRatio ||
         canvasCtx.msBackingStorePixelRatio ||
         canvasCtx.oBackingStorePixelRatio ||
         canvasCtx.backingStorePixelRatio || 1;
       this.ratio = devicePixelRatio / backingStoreRatio;
-      this.setCanvasWidth(300);
+      this.setCanvasWidth(Math.min(768, window.document.documentElement.clientWidth));
       this.setCanvasHeight(300);
 
       window.canvasCtx = this.canvasCtx;
     }
   };
   setCanvasWidth(width) {
+    width = width - 20; // padding size
     const canvas = this.canvas;
     canvas.width = width * this.ratio;
     canvas.style.width = `${width}px`;
@@ -78,8 +83,8 @@ export default class Question extends Component {
   drawQuestion(props) {
     this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     const context = this.canvasCtx
-    context.fillStyle = 'white';
-    context.font = `${16 * this.ratio}px serif`;
+    context.fillStyle = '#333';
+    context.font = `${this.fontSize * this.ratio}px serif`;
 
     let text = props.question;
     let breakPoint = 0;
@@ -91,14 +96,19 @@ export default class Question extends Component {
     if (text) {
       result.push(text);
     }
-    const height = (result.length + 1) * this.lineHeight;
+    const height = (result.length + 1) * this.lineHeight / this.devicePixelRatio;
     this.setCanvasHeight(height);
-    context.fillStyle = 'white';
-    context.font = `${16 * this.ratio}px serif`;
+    context.fillStyle = '#333';
+    context.font = `${this.fontSize * this.ratio}px serif`;
 
     result.forEach((line, index) => {
       context.fillText(line, 0, this.lineHeight * (index + 1));
     });
+  }
+  resizeHandle() {
+    const nextWidth = Math.min(768, window.document.documentElement.clientWidth);
+    this.setCanvasWidth(nextWidth);
+    this.drawQuestion(this.props);
   }
   shouldComponentUpdate(nextProps) {
     if (!this.props.question || !this.canvas) {
@@ -108,10 +118,8 @@ export default class Question extends Component {
   }
   render() {
     return (
-      <div style={{ margin: '0 auto' }}>
-        <canvas 
-          width="300"
-          height="300"
+      <div className="question-wrap">
+        <canvas
           ref={canvas => this.initCanvas(canvas)} 
         />
       </div>

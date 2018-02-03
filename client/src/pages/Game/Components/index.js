@@ -56,11 +56,11 @@ export default class Game extends Component {
   }
   render() {
     return (
-      <div className="game">
+      <main className="game">
         <Stage {...this.props} />
         <Modals {...this.props} />
         <ToastContainer />
-      </div>
+      </main>
     );
   };
 }

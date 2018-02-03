@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import QA from './QA';
-import './index.css';
 
 export default class StagesStart extends Component {
   state = {
@@ -42,26 +41,20 @@ export default class StagesStart extends Component {
       this.startCountdown();
     }
   }
-  renderGameCountdown() {
-    const { control: { endTime } } = this.props;
+  renderInfo() {
+    const { control: { endTime }, userId } = this.props;
     return (
-      <div>
-        还剩 {Math.floor((endTime - this.state.now) / 1000)} 秒
-      </div>
-    );
-  }
-  renderStatistics() {
-    return (
-      <div>
-        当前得分：{this.props.score.point}
+      <div className="info-wrap">
+        <p>{userId}</p>
+        <p>还剩 {Math.floor((endTime - this.state.now) / 1000)} 秒</p>
+        <p>当前得分：{this.props.score.point}</p>
       </div>
     );
   }
   render() {
     return (
       <div>
-        {this.renderGameCountdown()}
-        {this.renderStatistics()}
+        {this.renderInfo()}
         <QA 
           {...this.props.question}
           answerQuestion={this.props.answerQuestion}
