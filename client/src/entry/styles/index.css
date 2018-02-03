@@ -17,6 +17,19 @@ main {
   outline: none;
 }
 
+.rodal-dialog { 
+  transition: width 100ms;
+  text-align: center;
+  font-size: 20px;
+}
+@media (max-width: 768px) {
+  .rodal-dialog {
+    margin-left: 10%;
+    margin-right: 10%;
+    width: initial !important;
+  }
+}
+
 .btn {
   background-color: transparent;
   border: #fff 2px solid;
@@ -26,7 +39,7 @@ main {
 }
 
 .btn.focus, .btn:focus,
-.btn.btn:hover {
+.btn:hover {
   background-color: #fff;
   border-color: #fff;
   color: #333;
@@ -44,4 +57,12 @@ main {
   border-color: #dadada;
   color: #5a5a5a;
   cursor: default;
+}
+
+.btn.inverse {
+  border-color: rgb(252, 208, 54);
+}
+.btn.inverse.focus, .btn.inverse:focus,
+.btn.inverse:hover {
+  background-color: rgb(252, 208, 54);
 }

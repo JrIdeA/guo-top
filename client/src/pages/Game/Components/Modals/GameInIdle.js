@@ -12,6 +12,7 @@ export default class ModalGameInIdle extends Component {
         onClose={this.handleClose}
       >
           <div>游戏暂未开始，请勿着急</div>
+          <button className="btn inverse" onClick={this.handleClose}>确定</button>
       </Rodal>
     );
   }
