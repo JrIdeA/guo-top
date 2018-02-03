@@ -1,4 +1,4 @@
-const { values, each, sortBy, map, every, reverse, shuffle, size, get, groupBy, each } = require('lodash');
+const { values, each, sortBy, map, every, reverse, shuffle, size, get } = require('lodash');
 const CreateGameUser = require('../../game-user');
 const { logger } = require('../../utils');
 
