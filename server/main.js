@@ -167,7 +167,9 @@ wss.on('connection', (ws) => {
           }
           const nextQuiz = user.getNextQuiz();
           if (!nextQuiz) {
-            response.send.answeredAll();
+            response.send.answeredAll({
+              score: user.getScore(),
+            });
             user.endGame(clientTime);
             return;
           }

@@ -192,12 +192,16 @@ export const reducers = {
       score,
     };
   },
-  [WS_SERVER_SEND_ANSWERED_ALL](state) {
-    return replaceChildNode(
+  [WS_SERVER_SEND_ANSWERED_ALL](state, { score }) {
+    const nextState = replaceChildNode(
       state, 
       'control.answeredAll',
       true
     );
+    return {
+      ...nextState,
+      score,
+    }
   },
   [WS_SERVER_SEND_GAME_RESULT](state, score) {
     return {

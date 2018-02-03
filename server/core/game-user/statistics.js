@@ -14,7 +14,7 @@ class GameUserStatistic {
   markWrong(specialAnswer) {
     this.total += 1;
     this.wrong += 1;
-    if (!specialAnswer) {
+    if (specialAnswer) {
       this.point -= 1;
     }
   }
