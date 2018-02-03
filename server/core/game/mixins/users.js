@@ -1,6 +1,13 @@
-const { values, each, sortBy, map, every, reverse, shuffle, size, get } = require('lodash');
+const { values, each, sortBy, map, every, reverse, shuffle, size, get, groupBy, each } = require('lodash');
 const CreateGameUser = require('../../game-user');
 const { logger } = require('../../utils');
+
+function isSameScore(score1, score2) {
+  if (!score1 || !score2) return false;
+  return score1.point === score2.point &&
+    score1.accuracy === score2.accuracy &&
+    score1.total === score2.total;
+}
 
 const GameUsersProto = {
   initUsers() {
@@ -40,12 +47,7 @@ const GameUsersProto = {
     let current;
     while(current = rankedList.shift()) { // eslint-disable-line
       if (!current) break;
-      if (!(
-        prev &&
-        current.point === prev.point &&
-        current.accuracy === prev.accuracy &&
-        current.total === prev.total
-      )) {
+      if (!isSameScore(prev, current)) {
         rank++;
       }
       const user = this._loginedUsers[current.userId];
@@ -53,13 +55,16 @@ const GameUsersProto = {
 
       current.rank = rank;
       resultRankList.push(current);
+      prev = current;
     }
     this.resultRankList = resultRankList;
 
     logger.debug('game end and calculated rank result list', this.resultRankList);
   },
   _calculateFinalGroup() {
-    const shuffledRankList = shuffle(this.resultRankList);
+    const shuffledRankList = shuffle(
+      this.resultRankList.slice(0, 16)
+    );
     const group = [];
     for (let index = 0; index < shuffledRankList.length; index += 2) {
       group.push({
