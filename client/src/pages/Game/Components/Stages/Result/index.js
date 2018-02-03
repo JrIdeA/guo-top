@@ -17,7 +17,7 @@ export default class GameStageResult extends Component {
       <div className="stage-result">
         <h2>{this.renderTitle()}</h2>
         <p>你的排名为：{rank}， 得分为：{point}</p>
-        <button className="btn btn-primary">查看所有排名及决赛分组</button>
+        <a href="/result" className="btn">查看所有排名及决赛分组</a>
       </div>
     );
   }

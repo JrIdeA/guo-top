@@ -22,12 +22,15 @@ main {
   border: #fff 2px solid;
   padding: 10px 30px;
   border-radius: 25px;
+  color: #333;
 }
 
 .btn.focus, .btn:focus,
 .btn.btn:hover {
   background-color: #fff;
   border-color: #fff;
+  color: #333;
+  text-decoration: none;
 }
 
 .btn.disabled,

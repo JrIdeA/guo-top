@@ -46,7 +46,7 @@ app.get('/', (req, res) => {
 app.get('/game', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/static/game.html'));
 });
-app.get('/rank', (req, res) => {
+app.get('/result', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/static/rank.html'));
 });
 app.get('/api/game', (req, res) => {

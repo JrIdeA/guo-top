@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
+import './index.css';
 
 export default class GameStageReady extends Component {
-  render() {
+  getDisplayedSeconds = () => {
+    return this.props.leftStartSeconds + 1;
+  }
+  renderSoon = () => {
     return (
       <div>
         <h1>百万榛果冲顶大会</h1>
-        <p>游戏将于 {this.props.startTimeFormatted} 开始，倒计时 {this.props.leftStartSeconds} 秒</p>
+        <p>游戏将于 {this.props.startTimeFormatted} 开始，倒计时 {this.getDisplayedSeconds()} 秒</p>
         <div>
           <h3>规则：</h3>
           <p>你需要在 {this.props.game.playtimeSeconds} 秒内进行答题，题目均为单选题。</p>
@@ -18,6 +22,23 @@ export default class GameStageReady extends Component {
           <p>可以快速的使用 1 2 3 来选择答案，分别对应 a b c 选项。</p>
           <p>虽然不限制使用搜索引擎搜索答案，但是不建议，因为这样会严重降低答题速度 :)</p>
         </div>
+      </div>
+    );
+  };
+  renderCountdown = () => {
+    return (
+      <div className="prepare-countdown">
+        {this.getDisplayedSeconds()}
+      </div>
+    );
+  };
+  render() {
+    const content = this.getDisplayedSeconds() < 6 ?
+      this.renderCountdown() :
+      this.renderSoon();
+    return (
+      <div className="stage-ready">
+        {content}
       </div>
     );
   }

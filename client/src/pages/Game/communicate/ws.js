@@ -41,7 +41,7 @@ const gameWs = {
   dispatch: null,
   ws: null,
   connect() {
-    const ws = new window.WebSocket(`ws://localhost:8000/socket`);
+    const ws = new window.WebSocket(`ws://${window.location.host}/socket`);
     ws.addEventListener('message', (e) => {
       const data = decodeMessage(e.data);
       logger.log('ws: get message', data);

@@ -21,10 +21,10 @@ export default class Home extends Component {
       );
     }
     return (
-      <button 
+      <a 
         className="btn"
-        onClick={() => window.location.href = '/rank'}
-      >游戏已结束，查看结果</button>
+        href="/result"
+      >游戏已结束，查看结果</a>
     );
   }
   renderIntro() {

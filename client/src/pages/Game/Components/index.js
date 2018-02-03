@@ -56,7 +56,7 @@ export default class Game extends Component {
   }
   render() {
     return (
-      <main className="game">
+      <main>
         <Stage {...this.props} />
         <Modals {...this.props} />
         <ToastContainer />
