@@ -25,6 +25,7 @@ const questionsData = JSON.parse(fs.readFileSync(path.join(
   __dirname, '../data/questions/index.json'
 )));
 const game = new Game(config.game, questionsData);
+global.game = game;
 
 const userTokenData = JSON.parse(fs.readFileSync(path.join(
   __dirname, '../data/token/token.json'
@@ -60,8 +61,12 @@ app.get('/api/game', (req, res) => {
 });
 app.get('/api/result', (req, res) => {
   const status = game.getStatus();
+  const rankList = game.getResultRankList();
+  const finalGroup = game.getFinalGroup();
   res.send({
     status,
+    rankList,
+    finalGroup,
   });
 });
 app.use(express.static(path.join(__dirname, '../client/static')));

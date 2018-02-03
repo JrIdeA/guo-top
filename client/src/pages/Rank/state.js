@@ -13,6 +13,8 @@ export const initState = {
   readyTime: 0,
   startTime: 0,
   error: null,
+  rankList: [],
+  finalGroup: [],
 };
 export const computed = {
   readyTimeFormatted: state => formatTime(state.readyTime),
@@ -32,11 +34,12 @@ export const reducers = {
   [actionTypes.setError](state, payload) {
     return replaceChildNode(state, 'error', payload);
   },
-  [actionTypes.loadSuccess](state, { status, rankList }) {
+  [actionTypes.loadSuccess](state, { status, rankList, finalGroup }) {
     return {
       ...state,
       status,
-      rankList
+      rankList,
+      finalGroup,
     };
   },
 };

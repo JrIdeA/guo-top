@@ -1,4 +1,4 @@
-const { values, each, sortBy, map, every, reverse, shuffle, size } = require('lodash');
+const { values, each, sortBy, map, every, reverse, shuffle, size, get } = require('lodash');
 const CreateGameUser = require('../../game-user');
 const { logger } = require('../../utils');
 
@@ -63,9 +63,9 @@ const GameUsersProto = {
     const group = [];
     for (let index = 0; index < shuffledRankList.length; index += 2) {
       group.push({
-        group: Math.ceil(index + 1),
-        competitor1: shuffledRankList[index].userId,
-        competitor2: shuffledRankList[index + 1].userId,
+        group: Math.ceil((index / 2) + 1),
+        competitor1: get(shuffledRankList[index], 'userId'),
+        competitor2: get(shuffledRankList[index + 1], 'userId'),
       });
     }
     this.finalGroup = group;
@@ -101,6 +101,7 @@ const GameUsersProto = {
   userEndGame() {
     if (every(values(this._loginedUsers), user => user.isEnd())) {
       this._calculateResultRank();
+      this._calculateFinalGroup();
       this.status.result = true;
     }
   },
