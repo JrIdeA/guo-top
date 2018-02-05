@@ -94,6 +94,14 @@ wss.on('connection', (ws) => {
   }
 
   let user;
+  const responseGameEnding = () => {
+    response.send.gameEnding({
+      score: user.getScore(),
+    });
+  };
+  const responseGameResult = () => {
+    response.send.gameResult(user.getResult());
+  };
   const actions = {
     [WS_CLIENT_TICKET]({
       token,
@@ -116,9 +124,7 @@ wss.on('connection', (ws) => {
               extendData.leftStartTime = game.getLeftStartTime();
             } if (status === 'start') {
               if (user.isEnd()) {
-                response.error.gameEnding({
-                  score: user.getScore(),
-                });
+                responseGameEnding();
                 return undefined;
               }
               user.giveupCurrentQuizIfNotAnswer();
@@ -160,9 +166,9 @@ wss.on('connection', (ws) => {
             user.isEnd()
           ) {
             user.endGame(clientTime);
-            response.error.gameEnding({
-              score: user.getScore(),
-            });
+            if (!game.status.result) {
+              responseGameEnding();
+            }
             return;
           }
           const nextQuiz = user.getNextQuiz();
@@ -176,12 +182,10 @@ wss.on('connection', (ws) => {
           response.send.question(nextQuiz);
         }],
         ['ending', () => {
-          response.error.gameEnding({
-            score: user.getScore(),
-          });
+          responseGameEnding();
         }],
         ['result', () => {
-          response.send.gameResult(user.getResult());
+          responseGameResult();
         }],
       ]);
     },
@@ -194,12 +198,10 @@ wss.on('connection', (ws) => {
           response.error.gameInIdle();
         }],
         ['ending', () => {
-          response.error.gameEnding({
-            score: user.getResult(),
-          });
+          responseGameEnding();
         }],
         ['result', () => {
-          response.send.gameResult(user.getResult());
+          responseGameResult();
         }],
         [['start'], () => {
           const answerResult = user.answerQuiz(
@@ -228,13 +230,13 @@ wss.on('connection', (ws) => {
           response.error.gameInIdle();
         }],
         ['result', () => {
-          response.send.gameResult(user.getResult());
+          responseGameResult();
         }],
         [['start'], () => {
           user.endGame(time);
-          response.error.gameEnding({
-            score: user.getScore(),
-          });
+          if (!game.status.result) {
+            responseGameEnding();
+          }
         }],
       ]);
     },
@@ -242,17 +244,17 @@ wss.on('connection', (ws) => {
 
   game.onStatusChange.result(() => {
     if (user) {
-      response.send.gameResult(user.getResult());
+      responseGameResult();
     }
   });
 
   ws.on('message', (msgStr) => {
-    logger.debug('get message', msgStr);
     if (msgStr === 'hb') {
       logger.debug('client heartbeat');
       ws.send('hb');
       return undefined;
     }
+    logger.debug('get message', msgStr);
 
     let message;
     try {

@@ -55,11 +55,7 @@ export default class StagesStart extends Component {
     return (
       <div>
         {this.renderInfo()}
-        <QA 
-          {...this.props.question}
-          answerQuestion={this.props.answerQuestion}
-          control={this.props.control}
-        />
+        <QA {...this.props} />
       </div>
     );
   }

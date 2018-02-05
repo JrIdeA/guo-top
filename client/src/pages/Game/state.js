@@ -12,7 +12,7 @@ import {
   ERROR_USER_NOT_REGISTER,
   ERROR_USRE_ALREADY_ANSWERED,
   ERROR_GAME_NOT_START,
-  ERROR_GAME_ENDING,
+  WS_SERVER_SEND_GAME_ENDING,
   WS_CLIENT_SEND_ANSWER,
   WS_SERVER_GAME_INFO,
   WS_SERVER_WELCOME,
@@ -64,7 +64,11 @@ export const computed = {
   leftStartSeconds(state) {
     if (!state.control.startTime) return 0;
     return Math.floor((state.control.startTime - state.control.now) / 1000);
-  }
+  },
+  gameTimeout(state) {
+    const { endTime } = state.control;
+    return endTime && Date.now() > endTime;
+  },
 };
 export const actionTypes = {
   completeContraCheats: 'completeContraCheats',
@@ -213,7 +217,7 @@ export const reducers = {
       },
     };
   },
-  [ERROR_GAME_ENDING](state, { score }) {
+  [WS_SERVER_SEND_GAME_ENDING](state, { score }) {
     if (state.game.status === 'result') return state;
     return {
       ...state,

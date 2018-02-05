@@ -2,9 +2,6 @@ import logger from '../utils/logger';
 
 const { isArray, isPlainObject, isString, isNil, shuffle } = require('lodash');
 const QuestionQueue = require('./queue');
-const {
-  ERROR_QUESTION_OPTIONS_INVALID,
-} = require('../../../shared/error');
 
 function normalizeQuestionsData(questionsData) {
   const isValidQuestion = (questionData) => {

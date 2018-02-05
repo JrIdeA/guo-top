@@ -1,13 +1,10 @@
 const lz = require('lz-string');
 const {
   ERROR_BAD_REQUEST,
-  ERROR_QUESTION_OPTIONS_INVALID,
   ERROR_USER_NOT_REGISTER,
-  ERROR_USER_NOT_LOGIN,
   ERROR_USER_NOT_ONLINE,
   ERROR_GAME_IN_IDLE,
   ERROR_GAME_NOT_START,
-  ERROR_GAME_ENDING,
   ERROR_GAME_END_RESULTED,
   ERROR_USER_GAME_TIMEOUT,
   ERROR_USRE_ALREADY_ANSWERED,
@@ -19,6 +16,7 @@ const {
   WS_SERVER_SEND_QUESTION,
   WS_SERVER_SEND_ANSWER_RESULT,
   WS_SERVER_SEND_ANSWERED_ALL,
+  WS_SERVER_SEND_GAME_ENDING,
   WS_SERVER_SEND_GAME_RESULT,
 } = require('../../../shared/wstype');
 
@@ -45,6 +43,7 @@ module.exports = function createWsReponse(ws) {
       answer: sendSuccess(WS_SERVER_SEND_ANSWER_RESULT),
       gameInfo: sendSuccess(WS_SERVER_GAME_INFO),
       answeredAll: sendSuccess(WS_SERVER_SEND_ANSWERED_ALL),
+      gameEnding: sendSuccess(WS_SERVER_SEND_GAME_ENDING),
       gameResult: sendSuccess(WS_SERVER_SEND_GAME_RESULT),
     },
     error: {
@@ -53,7 +52,6 @@ module.exports = function createWsReponse(ws) {
       userNotOnline: sendError(ERROR_USER_NOT_ONLINE),
       gameInIdle: sendError(ERROR_GAME_IN_IDLE),
       gameNotStart: sendError(ERROR_GAME_NOT_START),
-      gameEnding: sendError(ERROR_GAME_ENDING),
       gameEndResulted: sendError(ERROR_GAME_END_RESULTED),
       userGameTimeout: sendError(ERROR_USER_GAME_TIMEOUT),
       userGameAlreadyAnswered: sendError(ERROR_USRE_ALREADY_ANSWERED),

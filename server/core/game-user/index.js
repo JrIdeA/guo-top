@@ -1,3 +1,4 @@
+/* eslint no-unused-expressions: 0 */
 const GameUserStatistic = require('./statistics');
 
 function createGameUser(game) {
@@ -57,7 +58,9 @@ function createGameUser(game) {
         };
       }
       const correct = target.answer(answerCode);
-      correct ? this.stat.markCorrect(target.isSpecial()) : this.stat.markWrong(target.isSpecial());
+      correct ?
+        this.stat.markCorrect(target.isSpecial()) :
+        this.stat.markWrong(target.isSpecial());
       this.stat.addAnswerLog({
         questionId, answerCode, answerClientTime,
       });

@@ -1,10 +1,13 @@
 html, body {
-  background-color: rgb(252, 208, 54) !important;
+  background-color: #F8D115 !important;
   background-image: url(http://s3.meituan.net/v1/mss_65766da973d14523b3d781fe3ac2bbac/op-assets/imgs/2018-02-02-030621.png);
   background-attachment: fixed;
   background-repeat: no-repeat;
-  background-position: bottom;
+  background-position: bottom center;
   background-size: 354px 160px;
+}
+body {
+  padding: 0;
 }
 
 main {
@@ -60,9 +63,9 @@ main {
 }
 
 .btn.inverse {
-  border-color: rgb(252, 208, 54);
+  border-color: #F8D115;
 }
 .btn.inverse.focus, .btn.inverse:focus,
 .btn.inverse:hover {
-  background-color: rgb(252, 208, 54);
+  background-color: #F8D115;
 }
