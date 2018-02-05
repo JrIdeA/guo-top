@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import QA from './QA';
+import './index.css';
 
 export default class StagesStart extends Component {
   state = {

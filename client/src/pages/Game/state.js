@@ -13,7 +13,6 @@ import {
   ERROR_USRE_ALREADY_ANSWERED,
   ERROR_GAME_NOT_START,
   WS_SERVER_SEND_GAME_ENDING,
-  WS_CLIENT_SEND_ANSWER,
   WS_SERVER_GAME_INFO,
   WS_SERVER_WELCOME,
   WS_SERVER_SEND_QUESTION,
@@ -64,10 +63,6 @@ export const computed = {
   leftStartSeconds(state) {
     if (!state.control.startTime) return 0;
     return Math.floor((state.control.startTime - state.control.now) / 1000);
-  },
-  gameTimeout(state) {
-    const { endTime } = state.control;
-    return endTime && Date.now() > endTime;
   },
 };
 export const actionTypes = {
