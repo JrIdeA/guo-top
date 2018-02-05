@@ -1,4 +1,4 @@
-const { values, each, sortBy, map, every, reverse, shuffle, size, get } = require('lodash');
+const { values, each, sortBy, map, every, reverse, shuffle, size, get, reduce } = require('lodash');
 const CreateGameUser = require('../../game-user');
 const { logger } = require('../../utils');
 
@@ -39,7 +39,7 @@ const GameUsersProto = {
         score.userId = user.id;
         return score;
       }),
-      ['point', 'accuracy', 'total', 'usedTime']
+      ['point', 'total']
     ));
     const resultRankList = [];
     let rank = 0;
@@ -115,6 +115,12 @@ const GameUsersProto = {
   },
   getFinalGroup() {
     return this.finalGroup;
+  },
+  getAllUsersLog() {
+    return reduce(this._onlineUsers, (p, user) => {
+      p[user.id] = user.getAnswerLog();
+      return p;
+    }, {});
   },
 };
 

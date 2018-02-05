@@ -171,7 +171,7 @@ wss.on('connection', (ws) => {
             }
             return;
           }
-          const nextQuiz = user.getNextQuiz();
+          const nextQuiz = user.getNextQuiz(clientTime);
           if (!nextQuiz) {
             response.send.answeredAll({
               score: user.getScore(),
@@ -254,7 +254,7 @@ wss.on('connection', (ws) => {
       ws.send('hb');
       return undefined;
     }
-    logger.debug('get message', msgStr);
+    logger.debug('get message', user && user.id, msgStr);
 
     let message;
     try {
@@ -278,9 +278,19 @@ wss.on('connection', (ws) => {
     }
   });
 });
-
 wss.on('error', (err) => {
   logger.error('wss error', err);
+});
+
+game.onStatusChange.result(() => {
+  if (config.resultLogPath) {
+    const logs = game.getAllUsersLog();
+    fs.writeFile(config.resultLogPath, JSON.stringify(logs, null, 2), (err) => {
+      if (err) {
+        logger.error('save result log error', err);
+      }
+    });
+  }
 });
 
 server.listen(config.port, () => {

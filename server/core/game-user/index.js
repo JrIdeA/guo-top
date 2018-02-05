@@ -125,6 +125,9 @@ function createGameUser(game) {
         rank: this.rank,
       }, this.getScore());
     }
+    getAnswerLog() {
+      return this.stat.getAnswerLog();
+    }
   };
 }
 

@@ -1,4 +1,4 @@
-const { values } = require('lodash');
+const { values, sortBy } = require('lodash');
 
 class GameUserStatistic {
   constructor() {
@@ -32,6 +32,7 @@ class GameUserStatistic {
   }
   addGetQuestionLog({ questionId, getQuestionClientTime }) {
     this.answerLog[questionId] = {
+      questionId,
       getQuestionClientTime,
       getQuestionServerTime: Date.now(),
     };
@@ -54,6 +55,9 @@ class GameUserStatistic {
       }
       return p + usedServerTime;
     }, 0);
+  }
+  getAnswerLog() {
+    return sortBy(this.answerLog, 'getQuestionServerTime');
   }
 }
 
