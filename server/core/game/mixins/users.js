@@ -32,7 +32,7 @@ const GameUsersProto = {
   _createUser(userId) {
     return new this.GameUser(userId);
   },
-  _calculateResultRank() {
+  calculateResultRank() {
     const rankedList = reverse(sortBy(
       map(this._loginedUsers, (user) => {
         const score = user.getScore();
@@ -57,11 +57,9 @@ const GameUsersProto = {
       resultRankList.push(current);
       prev = current;
     }
-    this.resultRankList = resultRankList;
-
-    logger.debug('game end and calculated rank result list', this.resultRankList);
+    return resultRankList;
   },
-  _calculateFinalGroup() {
+  calculateFinalGroup() {
     const shuffledRankList = shuffle(
       this.resultRankList.slice(0, 16)
     );
@@ -73,7 +71,7 @@ const GameUsersProto = {
         competitor2: get(shuffledRankList[index + 1], 'userId'),
       });
     }
-    this.finalGroup = group;
+    return group;
   },
   getUserByAuth(token) {
     const userId = this._tokenIdMap[token];
@@ -105,9 +103,11 @@ const GameUsersProto = {
   },
   userEndGame() {
     if (every(values(this._loginedUsers), user => user.isEnd())) {
-      this._calculateResultRank();
-      this._calculateFinalGroup();
+      this.resultRankList = this.calculateResultRank();
+      this.finalGroup = this.calculateFinalGroup();
       this.status.result = true;
+
+      logger.debug('game end and calculated rank result list', this.resultRankList);
     }
   },
   getResultRankList() {

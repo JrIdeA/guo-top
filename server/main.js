@@ -50,6 +50,9 @@ app.get('/game', (req, res) => {
 app.get('/result', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/static/rank.html'));
 });
+app.get('/monitor', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/static/monitor.html'));
+});
 app.get('/api/game', (req, res) => {
   const status = game.getStatus();
   res.send({
@@ -67,6 +70,16 @@ app.get('/api/result', (req, res) => {
     status,
     rankList,
     finalGroup,
+  });
+});
+app.get('/api/monitor', (req, res) => {
+  const status = game.getStatus();
+  const rankList = game.calculateResultRank();
+  const leftDeadTime = game.getLeftDeadTime();
+  res.send({
+    status,
+    rankList,
+    leftDeadTime,
   });
 });
 app.use(express.static(path.join(__dirname, '../client/static')));

@@ -1,4 +1,4 @@
-'use strict';
+process.env.NODE_ENV = 'development';
 
 const autoprefixer = require('autoprefixer');
 const path = require('path');
@@ -45,6 +45,10 @@ module.exports = {
     rank: [
       require.resolve('./polyfills'),
       resolveApp('src/pages/Rank/index.js'),
+    ],
+    monitor: [
+      require.resolve('./polyfills'),
+      resolveApp('src/pages/Monitor/index.js'),
     ],
   },
   output: {
@@ -230,6 +234,12 @@ module.exports = {
       template: paths.appHtml,
       filename: 'rank.html',
       chunks: ['rank']
+    }),
+    new HtmlWebpackPlugin({
+      inject: true,
+      template: paths.appHtml,
+      filename: 'monitor.html',
+      chunks: ['monitor']
     }),
     // Add module names to factory functions so they appear in browser profiler.
     new webpack.NamedModulesPlugin(),
