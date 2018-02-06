@@ -1,4 +1,5 @@
-'use strict';
+process.env.NODE_ENV = 'production';
+process.env.GENERATE_SOURCEMAP = false;
 
 const autoprefixer = require('autoprefixer');
 const path = require('path');
@@ -12,6 +13,7 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
+const resolveApp = paths.resolveApp;
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -35,7 +37,7 @@ if (env.stringified['process.env'].NODE_ENV !== '"production"') {
 }
 
 // Note: defined here because it will be used more than once.
-const cssFilename = 'static/css/[name].[contenthash:8].css';
+const cssFilename = 'css/[name].[contenthash:8].css';
 
 // ExtractTextPlugin expects the build output to be flat.
 // (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
@@ -56,10 +58,27 @@ module.exports = {
   // You can exclude the *.map files from the build during deployment.
   devtool: shouldUseSourceMap ? 'source-map' : false,
   // In production, we only want to load the polyfills and the app code.
-  entry: [require.resolve('./polyfills'), paths.appIndexJs],
+  entry: {
+    home: [
+      require.resolve('./polyfills'),
+      resolveApp('src/pages/Home/index.js'),
+    ],
+    game: [
+      require.resolve('./polyfills'),
+      resolveApp('src/pages/Game/index.js'),
+    ],
+    rank: [
+      require.resolve('./polyfills'),
+      resolveApp('src/pages/Rank/index.js'),
+    ],
+    monitor: [
+      require.resolve('./polyfills'),
+      resolveApp('src/pages/Monitor/index.js'),
+    ],
+  },
   output: {
     // The build folder.
-    path: paths.appBuild,
+    path: resolveApp('static'),
     // Generated JS file names (with nested folders).
     // There will be one main bundle, and one file per asynchronous chunk.
     // We don't currently advertise code splitting but Webpack supports it.
@@ -244,6 +263,62 @@ module.exports = {
     new HtmlWebpackPlugin({
       inject: true,
       template: paths.appHtml,
+      filename: 'home.html',
+      chunks: ['home'],
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      },
+    }),
+    new HtmlWebpackPlugin({
+      inject: true,
+      template: paths.appHtml,
+      filename: 'game.html',
+      chunks: ['game'],
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      },
+    }),
+    new HtmlWebpackPlugin({
+      inject: true,
+      template: paths.appHtml,
+      filename: 'rank.html',
+      chunks: ['rank'],
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      },
+    }),
+    new HtmlWebpackPlugin({
+      inject: true,
+      template: paths.appHtml,
+      filename: 'monitor.html',
+      chunks: ['monitor'],
       minify: {
         removeComments: true,
         collapseWhitespace: true,
