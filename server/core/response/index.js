@@ -19,12 +19,17 @@ const {
   WS_SERVER_SEND_GAME_ENDING,
   WS_SERVER_SEND_GAME_RESULT,
 } = require('../../../shared/wstype');
+const { logger } = require('../utils');
 
 module.exports = function createWsReponse(ws) {
   const send = (messageJson) => {
-    let message = JSON.stringify(messageJson);
-    message = lz.compressToUTF16(message);
-    ws.send(message);
+    const message = JSON.stringify(messageJson);
+    const encodedMessage = lz.compressToUTF16(message);
+    try {
+      ws.send(encodedMessage);
+    } catch (err) {
+      logger.error('websocket send message error: ', err);
+    }
   };
   const sendError = errorType => payload => send({
     type: WS_SERVER_ERROR,

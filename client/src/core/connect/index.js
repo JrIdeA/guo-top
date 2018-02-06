@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { mapValues, cloneDeep, get } from 'lodash';
+import { mapValues } from 'lodash';
 
 export default ({
   initState,

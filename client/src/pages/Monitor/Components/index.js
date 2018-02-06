@@ -7,7 +7,7 @@ export default class Monitor extends Component {
   }
   renderStatus() {
     const statusText = `当前游戏状态：${this.props.status}`;
-    const deadTimeText = `，距离最终结束时间：${this.props.leftDeadTime / 10000}`;
+    const deadTimeText = `，距离最终结束时间：${this.props.leftDeadTime / 1000}`;
     return (
       <div className="status">
         {statusText}

@@ -207,7 +207,7 @@ export const reducers = {
       ...state,
       score,
       game: {
-        ...state,
+        ...state.game,
         status: 'result',
       },
     };

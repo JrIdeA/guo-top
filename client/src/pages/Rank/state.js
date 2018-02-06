@@ -1,6 +1,5 @@
 import moment from 'moment';
-import { delay } from 'redux-saga';
-import { takeLatest, select, put, take, fork, call, cancel } from 'redux-saga/effects';
+import { takeLatest, put } from 'redux-saga/effects';
 import { replaceChildNode, createActionCreator } from '../../core';
 
 function formatTime(time) {
