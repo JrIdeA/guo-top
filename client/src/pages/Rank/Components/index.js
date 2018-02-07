@@ -21,21 +21,21 @@ export default class Home extends Component {
         <h1>结果排名</h1>
         <div>
           <h2>排名：</h2>
-          <ul>
+          <ol>
             {this.props.rankList.map((score, index) => (
               <li key={index}>
                 #{score.rank} {score.userId} （得分：{score.point}，总答题数：{score.total}）
               </li>
             ))}
-          </ul>
+          </ol>
         </div>
         <div>
           <h2>决赛分组：</h2>
-          <ul>
+          <ol>
             {this.props.finalGroup.map(({ group, competitor1, competitor2 }) => (
               <li key={group}>分组{group}：{competitor1} {competitor2 && `VS ${competitor2}`}</li>
             ))}
-          </ul>
+          </ol>
         </div>
       </div>
     );

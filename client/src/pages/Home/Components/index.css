@@ -6,3 +6,8 @@ main .btn-wrap {
   text-align: center;
   margin-top: 30px;
 }
+
+main em {
+  font-style: initial;
+  font-weight: bold;
+}

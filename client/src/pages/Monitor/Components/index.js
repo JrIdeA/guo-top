@@ -17,13 +17,13 @@ export default class Monitor extends Component {
   }
   renderRankList() {
     return (
-      <ul>
+      <ol>
         {this.props.rankList.map(({ userId, point, total, usedTime, rank }) => (
           <li>
             #{rank} <span>{userId}</span> - 得分：{point}，答题数：{total}，用时：{usedTime / 1000}
           </li>
         ))}
-      </ul>
+      </ol>
     );
   }
   renderLoading() {

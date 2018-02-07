@@ -40,7 +40,7 @@ export default class Home extends Component {
         </div>
         <div>
           <h2>活动规则：</h2>
-          <p>预赛阶段将在 {this.props.startTimeFormatted} 正式开始，赛场入口将于 {this.props.readyTimeFormatted} 开启，请准时登录。</p>
+          <p>预赛阶段将在 <em>{this.props.startTimeFormatted}</em> 正式开始，赛场入口将于 <em>{this.props.readyTimeFormatted}</em> 开启，请准时登录。</p>
           <p>你需要在指定时间内进行答题，题目均为单选题。</p>
           <p>答题正确得一分，答题错误不扣分，每题必答不能跳过。</p>
           <p>答题结束后将统计所有人的得分，得分前 16 名将进入决赛进行两两 PK 角逐榛果知识王者的称号。</p>

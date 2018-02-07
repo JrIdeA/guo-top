@@ -86,6 +86,11 @@ app.use(express.static(path.join(__dirname, '../client/static')));
 
 const server = http.createServer(app);
 
+const onResultResponsers = [];
+game.onStatusChange.result(() => {
+  onResultResponsers.forEach(fn => fn());
+});
+
 const wss = new WebSocket.Server({
   server,
   verifyClient() {
@@ -254,8 +259,7 @@ wss.on('connection', (ws) => {
       ]);
     },
   };
-
-  game.onStatusChange.result(() => {
+  onResultResponsers.push(() => {
     if (user) {
       responseGameResult();
     }
@@ -263,7 +267,6 @@ wss.on('connection', (ws) => {
 
   ws.on('message', (msgStr) => {
     if (msgStr === 'hb') {
-      logger.debug('client heartbeat');
       ws.send('hb');
       return undefined;
     }

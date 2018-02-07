@@ -4,9 +4,7 @@ const { logger } = require('../../utils');
 
 function isSameScore(score1, score2) {
   if (!score1 || !score2) return false;
-  return score1.point === score2.point &&
-    score1.accuracy === score2.accuracy &&
-    score1.total === score2.total;
+  return score1.point === score2.point;
 }
 
 const GameUsersProto = {
@@ -48,7 +46,7 @@ const GameUsersProto = {
     while(current = rankedList.shift()) { // eslint-disable-line
       if (!current) break;
       if (!isSameScore(prev, current)) {
-        rank++;
+        rank = resultRankList.length + 1;
       }
       const user = this._loginedUsers[current.userId];
       user.setRank(rank);
@@ -60,15 +58,42 @@ const GameUsersProto = {
     return resultRankList;
   },
   calculateFinalGroup() {
-    const shuffledRankList = shuffle(
-      this.resultRankList.slice(0, 16)
-    );
+    let winners;
+    if (this.resultRankList.length < 16) {
+      winners = this.resultRankList.map(v => v.userId);
+    } else {
+      const lastPlaceWinner = this.resultRankList[15];
+      const samePointAsLastPlace = [];
+      let index = 16;
+      let current = this.resultRankList[index];
+      while (current) {
+        if (current.point != lastPlaceWinner.point) break;
+        samePointAsLastPlace.push(current);
+        current = this.resultRankList[++index];
+      }
+      if (samePointAsLastPlace.length) {
+        index = 14;
+        current = this.resultRankList[index];
+        while (current) {
+          if (current.point != lastPlaceWinner.point) break;
+          samePointAsLastPlace.push(current);
+          current = this.resultRankList[--index];
+        }
+        samePointAsLastPlace.push(lastPlaceWinner);
+        winners = this.resultRankList.slice(0, index + 1).map(v => v.userId);
+        winners.push(samePointAsLastPlace.map(v => v.userId).join(','));
+      } else {
+        winners = this.resultRankList.slice(0, 16).map(v => v.userId);
+      }
+    }
+
+    const shuffledWinners = shuffle(winners);
     const group = [];
-    for (let index = 0; index < shuffledRankList.length; index += 2) {
+    for (let index = 0; index < shuffledWinners.length; index += 2) {
       group.push({
         group: Math.ceil((index / 2) + 1),
-        competitor1: get(shuffledRankList[index], 'userId'),
-        competitor2: get(shuffledRankList[index + 1], 'userId'),
+        competitor1: shuffledWinners[index],
+        competitor2: shuffledWinners[index + 1],
       });
     }
     return group;
