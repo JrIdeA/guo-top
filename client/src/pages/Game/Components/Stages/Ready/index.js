@@ -19,7 +19,7 @@ export default class GameStageReady extends Component {
         </div>
         <div>
           <h3>友情提示：</h3>
-          <p>已尽力解决网络差异导致的计时差异，但仍请保证网络稳定。</p>
+          <p>已尽力解决网络差异导致的计时差异，但仍请保证网络稳定，建议使用 4G 网络。</p>
           <p>虽然不限制使用搜索引擎搜索答案，但是不建议，因为这样会严重降低答题速度 :)</p>
         </div>
       </div>

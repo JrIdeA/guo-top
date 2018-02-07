@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import classnames from 'classnames';
 import './index.css';
 
 export default class Home extends Component {
@@ -23,7 +24,7 @@ export default class Home extends Component {
           <h2>排名：</h2>
           <ol>
             {this.props.rankList.map((score, index) => (
-              <li key={index}>
+              <li key={index} className={classnames({ elimination: score.rank > 16 })}>
                 #{score.rank} {score.userId} （得分：{score.point}，总答题数：{score.total}）
               </li>
             ))}
